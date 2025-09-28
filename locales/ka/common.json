@@ -1,0 +1,29 @@
+{
+  "adminNavigation": {
+    "dashboard": "დაშბორდი",
+    "createUser": "მომხმარებლის შექმნა",
+    "createCategory": "კატეგორიის შექმნა",
+    "createJob": "სამუშაოს შექმნა",
+    "createCity": "ქალაქის შექმნა",
+    "allMasters": "ყველა მასტერი",
+    "billing": "ბილინგი",
+    "reviews": "რევიუები",
+    "reports": "რეპორტები",
+    "masterApplies": "მასტერის განაცხადები",
+    "contactUs": "კონტაქტი",
+    "newApplications": "ახალი განაცხადები",
+    "gmailSubscriptions": "Gmail გამოწერები"
+  },
+  "masterNavigation": {
+    "dashboard": "დაშბორდი",
+    "masterProfile": "მასტერის პროფილი",
+    "profileSettings": "პროფილის პარამეტრები",
+    "jobAssignment": "სამუშაოს მინიჭება",
+    "unlockCities": "ქალაქების განბლოკვა",
+    "unlockedCities": "განბლოკილი ქალაქები",
+    "leads": "ლიდები",
+    "notifications": "შეტყობინებები",
+    "reviews": "რევიუები",
+    "billing": "ბილინგი"
+  }
+}

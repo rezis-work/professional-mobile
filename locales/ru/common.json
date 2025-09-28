@@ -1,0 +1,29 @@
+{
+  "adminNavigation": {
+    "dashboard": "Панель управления",
+    "createUser": "Создать пользователя",
+    "createCategory": "Создать категорию",
+    "createJob": "Создать работу",
+    "createCity": "Создать город",
+    "allMasters": "Все мастера",
+    "billing": "Биллинг",
+    "reviews": "Отзывы",
+    "reports": "Отчеты",
+    "masterApplies": "Заявки мастеров",
+    "contactUs": "Свяжитесь с нами",
+    "newApplications": "Новые заявки",
+    "gmailSubscriptions": "Подписки на Gmail"
+  },
+  "masterNavigation": {
+    "dashboard": "Панель управления",
+    "masterProfile": "Профиль мастера",
+    "profileSettings": "Настройки профиля",
+    "jobAssignment": "Назначение работ",
+    "unlockCities": "Разблокировать города",
+    "unlockedCities": "Разблокированные города",
+    "leads": "Лиды",
+    "notifications": "Уведомления",
+    "reviews": "Отзывы",
+    "billing": "Биллинг"
+  }
+}

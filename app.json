@@ -43,6 +43,9 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "API_URL": "https://6daad0052cdc.ngrok-free.app"
     }
   }
 }

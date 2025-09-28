@@ -1,0 +1,29 @@
+{
+  "adminNavigation": {
+    "dashboard": "Dashboard",
+    "createUser": "Create User",
+    "createCategory": "Create Category",
+    "createJob": "Create Job",
+    "createCity": "Create City",
+    "allMasters": "All Masters",
+    "billing": "Billing",
+    "reviews": "Reviews",
+    "reports": "Reports",
+    "masterApplies": "Master Applies",
+    "contactUs": "Contact Us",
+    "newApplications": "New Applications",
+    "gmailSubscriptions": "Gmail Subscriptions"
+  },
+  "masterNavigation": {
+    "dashboard": "Dashboard",
+    "masterProfile": "Master Profile",
+    "profileSettings": "Profile Settings",
+    "jobAssignment": "Job Assignment",
+    "unlockCities": "Unlock Cities",
+    "unlockedCities": "Unlocked Cities",
+    "leads": "Leads",
+    "notifications": "Notifications",
+    "reviews": "Reviews",
+    "billing": "Billing"
+  }
+}
