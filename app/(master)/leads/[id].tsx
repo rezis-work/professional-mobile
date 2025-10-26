@@ -2,11 +2,11 @@ import { useLocalSearchParams } from "expo-router";
 import { SingleLeadView } from "@/modules/master/leads/ui/views/SingleLeadView";
 
 export default function LeadDetailScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id: leadId } = useLocalSearchParams<{ id: string }>();
 
-  if (!id) {
+  if (!leadId) {
     return null;
   }
 
-  return <SingleLeadView leadId={id} />;
+  return <SingleLeadView leadId={leadId} />;
 }

@@ -92,6 +92,12 @@ export default function MasterLayout() {
         }}
       />
       <Tabs.Screen
+        name="leads/[id]"
+        options={{
+          href: null, // Hide from tab bar
+        }}
+      />
+      <Tabs.Screen
         name="notifications"
         options={{
           title: "Notifications",
