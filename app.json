@@ -45,7 +45,7 @@
       "reactCompiler": true
     },
     "extra": {
-      "API_URL": "https://6daad0052cdc.ngrok-free.app"
+      "API_URL": "https://backend-ancient-water-2623.fly.dev"
     }
   }
 }
