@@ -1,26 +1,29 @@
-import { View, StyleSheet, Pressable } from "react-native";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
+import { Pressable, View, StyleSheet } from "react-native";
 import { LeadStatus } from "../../types";
+import { useTranslation } from "react-i18next";
 
 interface StatusFilterProps {
   selectedStatus: LeadStatus;
   onStatusChange: (status: LeadStatus) => void;
 }
 
-const statuses = [
-  { value: LeadStatus.UNDEFINED, label: "All" },
-  { value: LeadStatus.PENDING, label: "Pending" },
-  { value: LeadStatus.ACCEPTED, label: "Accepted" },
-  { value: LeadStatus.COMPLETED, label: "Completed" },
-  { value: LeadStatus.DECLINED, label: "Declined" },
-  { value: LeadStatus.CANCELLED, label: "Cancelled" },
-];
-
 export function StatusFilter({
   selectedStatus,
   onStatusChange,
 }: StatusFilterProps) {
+  const { t } = useTranslation();
+
+  const statuses = [
+    { value: LeadStatus.UNDEFINED, label: t("leads.all") },
+    { value: LeadStatus.PENDING, label: t("common.pending") },
+    { value: LeadStatus.ACCEPTED, label: t("profile.accepted") },
+    { value: LeadStatus.COMPLETED, label: t("common.completed") },
+    { value: LeadStatus.DECLINED, label: t("profile.declined") },
+    { value: LeadStatus.CANCELLED, label: t("leads.cancelled") },
+  ];
+
   return (
     <View style={styles.container}>
       {statuses.map((status) => (

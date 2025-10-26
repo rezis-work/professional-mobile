@@ -2,6 +2,7 @@ import { ThemedText } from "@/components/themed-text";
 import { TextInput, View } from "react-native";
 import type { UseFormSetValue } from "react-hook-form";
 import type { ProfileFormValues } from "../../schema";
+import { useTranslation } from "react-i18next";
 
 export function CityInput({
   setValue,
@@ -10,11 +11,13 @@ export function CityInput({
   setValue: UseFormSetValue<ProfileFormValues>;
   error?: string;
 }) {
+  const { t } = useTranslation();
+
   return (
     <View style={{ gap: 8 }}>
-      <ThemedText>City</ThemedText>
+      <ThemedText>{t("settings.city")}</ThemedText>
       <TextInput
-        placeholder="City"
+        placeholder={t("settings.enterCity")}
         onChangeText={(t) => setValue("city", t, { shouldValidate: true })}
         style={{
           borderWidth: 1,

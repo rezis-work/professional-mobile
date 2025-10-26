@@ -3,6 +3,7 @@ import { ThemedView } from "@/components/themed-view";
 import { Pressable, View, StyleSheet } from "react-native";
 import type { Lead } from "../../types";
 import { useRouter } from "expo-router";
+import { useTranslation } from "react-i18next";
 
 interface LeadCardProps {
   lead: Lead;
@@ -10,6 +11,7 @@ interface LeadCardProps {
 
 export function LeadCard({ lead }: LeadCardProps) {
   const router = useRouter();
+  const { t } = useTranslation();
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
@@ -60,32 +62,34 @@ export function LeadCard({ lead }: LeadCardProps) {
         </View>
 
         <View style={styles.infoRow}>
-          <ThemedText style={styles.label}>Job:</ThemedText>
+          <ThemedText style={styles.label}>{t("leads.job")}:</ThemedText>
           <ThemedText style={styles.value}>{lead.jobTitle.en}</ThemedText>
         </View>
 
         <View style={styles.infoRow}>
-          <ThemedText style={styles.label}>Location:</ThemedText>
+          <ThemedText style={styles.label}>{t("leads.location")}:</ThemedText>
           <ThemedText style={styles.value}>{lead.location}</ThemedText>
         </View>
 
         <View style={styles.infoRow}>
-          <ThemedText style={styles.label}>Requested Time:</ThemedText>
+          <ThemedText style={styles.label}>
+            {t("leads.requestedTime")}:
+          </ThemedText>
           <ThemedText style={styles.value}>
             {formatDate(lead.requestedTime)}
           </ThemedText>
         </View>
 
         <View style={styles.infoRow}>
-          <ThemedText style={styles.label}>Price:</ThemedText>
+          <ThemedText style={styles.label}>{t("leads.price")}:</ThemedText>
           <ThemedText style={styles.priceValue}>
-            {lead.price ? `${lead.price} ₾` : "Not set"}
+            {lead.price ? `${lead.price} ₾` : t("leads.notSet")}
           </ThemedText>
         </View>
 
         {lead.message && (
           <View style={styles.messageContainer}>
-            <ThemedText style={styles.label}>Message:</ThemedText>
+            <ThemedText style={styles.label}>{t("leads.message")}:</ThemedText>
             <ThemedText style={styles.messageText} numberOfLines={2}>
               {lead.message}
             </ThemedText>

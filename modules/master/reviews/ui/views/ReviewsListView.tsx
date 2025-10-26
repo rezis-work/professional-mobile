@@ -7,8 +7,10 @@ import { StatusFilter } from "../components/StatusFilter";
 import { Pagination } from "@/components/Pagination";
 import { useGetMasterReviews } from "../../hooks/use-get-master-reviews";
 import { ReviewStatus } from "../../types";
+import { useTranslation } from "react-i18next";
 
 export function ReviewsListView() {
+  const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState<string>(ReviewStatus.UNDEFINED);
   const limit = 10;
@@ -35,18 +37,18 @@ export function ReviewsListView() {
 
       {isLoading ? (
         <View style={styles.centerContainer}>
-          <ThemedText>Loading reviews...</ThemedText>
+          <ThemedText>{t("reviews.loadingReviews")}</ThemedText>
         </View>
       ) : error ? (
         <View style={styles.centerContainer}>
-          <ThemedText>Error loading reviews</ThemedText>
+          <ThemedText>{t("reviews.errorLoadingReviews")}</ThemedText>
           <ThemedText style={styles.errorMessage}>
             {error instanceof Error ? error.message : "Unknown error"}
           </ThemedText>
         </View>
       ) : !data || !data.data.reviews.length ? (
         <View style={styles.centerContainer}>
-          <ThemedText>No reviews found</ThemedText>
+          <ThemedText>{t("reviews.noReviewsFound")}</ThemedText>
         </View>
       ) : (
         <>

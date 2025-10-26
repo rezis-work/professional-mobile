@@ -4,12 +4,14 @@ import { ThemedView } from "@/components/themed-view";
 import { useGetLeadById } from "../../hooks/use-get-lead-by-id";
 import { ActionButtons } from "../components/ActionButtons";
 import { useRouter } from "expo-router";
+import { useTranslation } from "react-i18next";
 
 interface SingleLeadViewProps {
   leadId: string;
 }
 
 export function SingleLeadView({ leadId }: SingleLeadViewProps) {
+  const { t } = useTranslation();
   const router = useRouter();
   const { data, isLoading, error, refetch } = useGetLeadById(leadId);
 
@@ -20,7 +22,7 @@ export function SingleLeadView({ leadId }: SingleLeadViewProps) {
   if (isLoading) {
     return (
       <View style={styles.centerContainer}>
-        <ThemedText>Loading lead...</ThemedText>
+        <ThemedText>{t("leads.loadingLead")}</ThemedText>
       </View>
     );
   }
@@ -28,7 +30,7 @@ export function SingleLeadView({ leadId }: SingleLeadViewProps) {
   if (error) {
     return (
       <View style={styles.centerContainer}>
-        <ThemedText>Error loading lead</ThemedText>
+        <ThemedText>{t("leads.errorLoadingLead")}</ThemedText>
         <ThemedText>{error.message}</ThemedText>
       </View>
     );
@@ -37,7 +39,7 @@ export function SingleLeadView({ leadId }: SingleLeadViewProps) {
   if (!data) {
     return (
       <View style={styles.centerContainer}>
-        <ThemedText>Lead not found</ThemedText>
+        <ThemedText>{t("leads.leadNotFound")}</ThemedText>
       </View>
     );
   }
@@ -61,61 +63,65 @@ export function SingleLeadView({ leadId }: SingleLeadViewProps) {
     <ScrollView style={styles.container}>
       <ThemedView style={styles.content}>
         <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
-          <ThemedText style={styles.backButtonText}>← Back</ThemedText>
+          <ThemedText style={styles.backButtonText}>
+            ← {t("common.previous")}
+          </ThemedText>
         </TouchableOpacity>
 
         <ThemedText type="title" style={styles.title}>
-          Lead Details
+          {t("leads.leadDetails")}
         </ThemedText>
 
         <View style={styles.section}>
           <ThemedText type="subtitle" style={styles.sectionTitle}>
-            Client Information
+            {t("leads.clientInformation")}
           </ThemedText>
           <View style={styles.infoRow}>
-            <ThemedText style={styles.label}>Name:</ThemedText>
+            <ThemedText style={styles.label}>{t("leads.name")}:</ThemedText>
             <ThemedText style={styles.value}>{lead.client.fullName}</ThemedText>
           </View>
           <View style={styles.infoRow}>
-            <ThemedText style={styles.label}>Email:</ThemedText>
+            <ThemedText style={styles.label}>{t("leads.email")}:</ThemedText>
             <ThemedText style={styles.value}>{lead.client.email}</ThemedText>
           </View>
           <View style={styles.infoRow}>
-            <ThemedText style={styles.label}>Phone:</ThemedText>
+            <ThemedText style={styles.label}>{t("leads.phone")}:</ThemedText>
             <ThemedText style={styles.value}>{lead.client.phone}</ThemedText>
           </View>
         </View>
 
         <View style={styles.section}>
           <ThemedText type="subtitle" style={styles.sectionTitle}>
-            Job Details
+            {t("leads.jobDetails")}
           </ThemedText>
           <View style={styles.infoRow}>
-            <ThemedText style={styles.label}>Job:</ThemedText>
+            <ThemedText style={styles.label}>{t("leads.job")}:</ThemedText>
             <ThemedText style={styles.value}>{lead.jobTitle.en}</ThemedText>
           </View>
           <View style={styles.infoRow}>
-            <ThemedText style={styles.label}>Category:</ThemedText>
+            <ThemedText style={styles.label}>{t("leads.category")}:</ThemedText>
             <ThemedText style={styles.value}>{lead.categoryName.en}</ThemedText>
           </View>
           <View style={styles.infoRow}>
-            <ThemedText style={styles.label}>Location:</ThemedText>
+            <ThemedText style={styles.label}>{t("leads.location")}:</ThemedText>
             <ThemedText style={styles.value}>{lead.location}</ThemedText>
           </View>
           <View style={styles.infoRow}>
-            <ThemedText style={styles.label}>Requested Time:</ThemedText>
+            <ThemedText style={styles.label}>
+              {t("leads.requestedTime")}:
+            </ThemedText>
             <ThemedText style={styles.value}>
               {formatDate(lead.requestedTime)}
             </ThemedText>
           </View>
           <View style={styles.infoRow}>
-            <ThemedText style={styles.label}>Status:</ThemedText>
+            <ThemedText style={styles.label}>{t("leads.status")}:</ThemedText>
             <ThemedText style={styles.value}>{lead.status}</ThemedText>
           </View>
           <View style={styles.infoRow}>
-            <ThemedText style={styles.label}>Price:</ThemedText>
+            <ThemedText style={styles.label}>{t("leads.price")}:</ThemedText>
             <ThemedText style={[styles.value, styles.priceValue]}>
-              {lead.price ? `${lead.price} ₾` : "Not set"}
+              {lead.price ? `${lead.price} ₾` : t("leads.notSet")}
             </ThemedText>
           </View>
         </View>
@@ -123,7 +129,7 @@ export function SingleLeadView({ leadId }: SingleLeadViewProps) {
         {lead.message && (
           <View style={styles.section}>
             <ThemedText type="subtitle" style={styles.sectionTitle}>
-              Client Message
+              {t("leads.clientMessage")}
             </ThemedText>
             <View style={styles.messageContainer}>
               <ThemedText style={styles.messageText}>{lead.message}</ThemedText>

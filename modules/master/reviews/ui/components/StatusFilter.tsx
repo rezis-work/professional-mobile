@@ -1,6 +1,7 @@
 import { View, StyleSheet, TouchableOpacity } from "react-native";
 import { ThemedText } from "@/components/themed-text";
 import { ReviewStatus } from "../../types";
+import { useTranslation } from "react-i18next";
 
 interface StatusFilterProps {
   selectedStatus: string;
@@ -11,11 +12,13 @@ export function StatusFilter({
   selectedStatus,
   onStatusChange,
 }: StatusFilterProps) {
+  const { t } = useTranslation();
+
   const statuses = [
-    { label: "All", value: ReviewStatus.UNDEFINED },
-    { label: "Pending", value: ReviewStatus.PENDING },
-    { label: "Approved", value: ReviewStatus.APPROVED },
-    { label: "Rejected", value: ReviewStatus.REJECTED },
+    { label: t("reviews.all"), value: ReviewStatus.UNDEFINED },
+    { label: t("common.pending"), value: ReviewStatus.PENDING },
+    { label: t("common.approved"), value: ReviewStatus.APPROVED },
+    { label: t("common.rejected"), value: ReviewStatus.REJECTED },
   ];
 
   return (

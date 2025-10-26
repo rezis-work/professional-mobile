@@ -2,6 +2,7 @@ import { View, StyleSheet, TouchableOpacity } from "react-native";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import type { MasterBillingItem } from "../../types";
+import { useTranslation } from "react-i18next";
 
 interface BillingCardProps {
   billing: MasterBillingItem;
@@ -9,6 +10,8 @@ interface BillingCardProps {
 }
 
 export function BillingCard({ billing, onUploadProof }: BillingCardProps) {
+  const { t } = useTranslation();
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString();
@@ -32,10 +35,10 @@ export function BillingCard({ billing, onUploadProof }: BillingCardProps) {
       <View style={styles.header}>
         <View style={styles.headerLeft}>
           <ThemedText style={styles.title}>
-            Billing #{billing.id.slice(0, 8)}
+            {t("billing.billing")} #{billing.id.slice(0, 8)}
           </ThemedText>
           <ThemedText style={styles.createdDate}>
-            Created: {formatDate(billing.createdAt)}
+            {t("billing.created")}: {formatDate(billing.createdAt)}
           </ThemedText>
         </View>
         <View
@@ -50,40 +53,49 @@ export function BillingCard({ billing, onUploadProof }: BillingCardProps) {
 
       <View style={styles.statsGrid}>
         <View style={styles.statItem}>
-          <ThemedText style={styles.statLabel}>Total Jobs</ThemedText>
+          <ThemedText style={styles.statLabel}>
+            {t("billing.totalJobs")}
+          </ThemedText>
           <ThemedText style={styles.statValue}>{billing.totalJobs}</ThemedText>
         </View>
         <View style={styles.statItem}>
-          <ThemedText style={styles.statLabel}>Total Amount</ThemedText>
+          <ThemedText style={styles.statLabel}>
+            {t("billing.totalAmount")}
+          </ThemedText>
           <ThemedText style={styles.statValue}>
             {billing.totalAmount}₾
           </ThemedText>
         </View>
         <View style={styles.statItem}>
-          <ThemedText style={styles.statLabel}>Admin Fee</ThemedText>
+          <ThemedText style={styles.statLabel}>
+            {t("billing.adminFee")}
+          </ThemedText>
           <ThemedText style={styles.statValue}>{billing.adminFee}₾</ThemedText>
         </View>
       </View>
 
       <View style={styles.dateInfo}>
         <ThemedText style={styles.dateText}>
-          Week: {formatDate(billing.weekStart)} - {formatDate(billing.weekEnd)}
+          {t("billing.week")}: {formatDate(billing.weekStart)} -{" "}
+          {formatDate(billing.weekEnd)}
         </ThemedText>
         <ThemedText style={styles.dateText}>
-          Due Date: {formatDate(billing.dueDate)}
+          {t("billing.dueDate")}: {formatDate(billing.dueDate)}
         </ThemedText>
       </View>
 
       {billing.adminNote && (
         <View style={styles.noteSection}>
-          <ThemedText style={styles.noteLabel}>Admin Note:</ThemedText>
+          <ThemedText style={styles.noteLabel}>
+            {t("billing.adminNote")}:
+          </ThemedText>
           <ThemedText style={styles.noteText}>{billing.adminNote}</ThemedText>
         </View>
       )}
 
       <View style={styles.reminderSection}>
         <ThemedText style={styles.reminderText}>
-          Reminders Sent: {billing.remindersSent}
+          {t("billing.remindersSent")}: {billing.remindersSent}
         </ThemedText>
       </View>
 
@@ -92,7 +104,9 @@ export function BillingCard({ billing, onUploadProof }: BillingCardProps) {
         onPress={onUploadProof}
         activeOpacity={0.7}
       >
-        <ThemedText style={styles.uploadButtonText}>Upload Proof</ThemedText>
+        <ThemedText style={styles.uploadButtonText}>
+          {t("billing.uploadProof")}
+        </ThemedText>
       </TouchableOpacity>
     </ThemedView>
   );

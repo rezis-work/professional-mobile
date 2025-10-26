@@ -8,9 +8,11 @@ import { ProfileHeader } from "../components/ProfileHeader";
 import { StatsRow } from "../components/StatsRow";
 import { BioCard } from "../components/BioCard";
 import { LeadStatsCard } from "../components/LeadStatsCard";
+import { useTranslation } from "react-i18next";
 
 export function MasterProfileView() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const id = user?.id ?? "";
   const {
     data: profile,
@@ -57,7 +59,7 @@ export function MasterProfileView() {
           padding: 16,
         }}
       >
-        <ThemedText>Failed to load profile</ThemedText>
+        <ThemedText>{t("common.failedToLoadProfile")}</ThemedText>
       </ThemedView>
     );
   }

@@ -3,6 +3,7 @@ import * as ExpoImagePicker from "expo-image-picker";
 import { TouchableOpacity, View, Image, Alert } from "react-native";
 import type { UseFormSetValue } from "react-hook-form";
 import type { ProfileFormValues } from "../../schema";
+import { useTranslation } from "react-i18next";
 
 export function ImagePickerInput({
   setValue,
@@ -11,19 +12,18 @@ export function ImagePickerInput({
   setValue: UseFormSetValue<ProfileFormValues>;
   uri?: string;
 }) {
+  const { t } = useTranslation();
+
   return (
     <View style={{ gap: 8 }}>
-      <ThemedText>Profile Image</ThemedText>
+      <ThemedText>{t("settings.profileImage")}</ThemedText>
       <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
         <TouchableOpacity
           onPress={async () => {
             const { status } =
               await ExpoImagePicker.requestMediaLibraryPermissionsAsync();
             if (status !== "granted") {
-              Alert.alert(
-                "Permission required",
-                "We need media permissions to pick an image."
-              );
+              Alert.alert(t("common.error"), t("settings.permissionRequired"));
               return;
             }
             const result = await ExpoImagePicker.launchImageLibraryAsync({
@@ -49,7 +49,9 @@ export function ImagePickerInput({
             borderRadius: 8,
           }}
         >
-          <ThemedText style={{ color: "white" }}>Pick Image</ThemedText>
+          <ThemedText style={{ color: "white" }}>
+            {t("settings.pickImage")}
+          </ThemedText>
         </TouchableOpacity>
       </View>
       {uri ? (

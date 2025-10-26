@@ -10,6 +10,7 @@ import {
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useCompleteLead } from "../../hooks/use-complete-lead";
+import { useTranslation } from "react-i18next";
 
 interface CompleteLeadModalProps {
   visible: boolean;
@@ -22,6 +23,7 @@ export function CompleteLeadModal({
   onClose,
   leadId,
 }: CompleteLeadModalProps) {
+  const { t } = useTranslation();
   const [price, setPrice] = useState("");
   const { mutate: completeLead, isPending } = useCompleteLead();
 
@@ -40,8 +42,8 @@ export function CompleteLeadModal({
         },
         onError: (error: any) => {
           const message =
-            error?.response?.data?.message || "Failed to complete lead";
-          Alert.alert("Error", message);
+            error?.response?.data?.message || t("leads.failedToComplete");
+          Alert.alert(t("common.error"), message);
         },
       }
     );
@@ -65,15 +67,15 @@ export function CompleteLeadModal({
         <ThemedView style={styles.modalContent}>
           <View style={styles.header}>
             <ThemedText type="title" style={styles.title}>
-              Complete Lead
+              {t("leads.completeLead")}
             </ThemedText>
             <ThemedText style={styles.subtitle}>
-              Enter the final price for this job
+              {t("leads.enterFinalPrice")}
             </ThemedText>
           </View>
 
           <View style={styles.inputContainer}>
-            <ThemedText style={styles.label}>Price</ThemedText>
+            <ThemedText style={styles.label}>{t("leads.price")}</ThemedText>
             <View style={styles.inputWrapper}>
               <TextInput
                 style={styles.input}
@@ -88,7 +90,7 @@ export function CompleteLeadModal({
             </View>
             {price && !isValidPrice && (
               <ThemedText style={styles.errorText}>
-                Please enter a valid price
+                {t("leads.invalidPrice")}
               </ThemedText>
             )}
           </View>
@@ -100,7 +102,9 @@ export function CompleteLeadModal({
               disabled={isPending}
               activeOpacity={0.7}
             >
-              <ThemedText style={styles.cancelButtonText}>Cancel</ThemedText>
+              <ThemedText style={styles.cancelButtonText}>
+                {t("common.cancel")}
+              </ThemedText>
             </TouchableOpacity>
             <TouchableOpacity
               style={[
@@ -113,7 +117,7 @@ export function CompleteLeadModal({
               activeOpacity={0.7}
             >
               <ThemedText style={styles.submitButtonText}>
-                {isPending ? "Completing..." : "Complete Lead"}
+                {isPending ? t("leads.completing") : t("leads.completeLead")}
               </ThemedText>
             </TouchableOpacity>
           </View>

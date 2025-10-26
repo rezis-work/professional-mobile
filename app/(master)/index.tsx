@@ -3,18 +3,21 @@ import { ThemedText } from "@/components/themed-text";
 import { TouchableOpacity, Alert } from "react-native";
 import { useAuth } from "@/lib/auth";
 import { useRouter } from "expo-router";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { useTranslation } from "react-i18next";
 
 export default function MasterDashboardScreen() {
   const { logout } = useAuth();
   const router = useRouter();
+  const { t } = useTranslation();
 
   const handleLogout = async () => {
     try {
       await logout();
-      Alert.alert("Signed out", "You have been logged out.");
+      Alert.alert(t("common.success"), t("common.loggedOut"));
       router.replace("/(auth)/login");
     } catch {
-      Alert.alert("Error", "Failed to logout. Please try again.");
+      Alert.alert(t("common.error"), t("common.logoutFailed"));
     }
   };
 
@@ -24,10 +27,14 @@ export default function MasterDashboardScreen() {
         flex: 1,
         alignItems: "center",
         justifyContent: "center",
-        gap: 16,
+        gap: 24,
+        padding: 20,
       }}
     >
-      <ThemedText type="title">Master Dashboard</ThemedText>
+      <ThemedText type="title">{t("masterNavigation.dashboard")}</ThemedText>
+
+      <LanguageSwitcher />
+
       <TouchableOpacity
         onPress={handleLogout}
         style={{
@@ -37,7 +44,7 @@ export default function MasterDashboardScreen() {
           borderRadius: 8,
         }}
       >
-        <ThemedText style={{ color: "white" }}>Logout</ThemedText>
+        <ThemedText style={{ color: "white" }}>{t("common.logout")}</ThemedText>
       </TouchableOpacity>
     </ThemedView>
   );

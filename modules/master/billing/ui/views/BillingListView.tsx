@@ -6,8 +6,10 @@ import { BillingCard } from "../components/BillingCard";
 import { UploadProofModal } from "../components/UploadProofModal";
 import { Pagination } from "@/components/Pagination";
 import { useGetMasterBillings } from "../../hooks/use-get-master-billings";
+import { useTranslation } from "react-i18next";
 
 export function BillingListView() {
+  const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedBillingId, setSelectedBillingId] = useState("");
@@ -33,18 +35,18 @@ export function BillingListView() {
     <ThemedView style={styles.container}>
       {isLoading ? (
         <View style={styles.centerContainer}>
-          <ThemedText>Loading billing...</ThemedText>
+          <ThemedText>{t("billing.loadingBilling")}</ThemedText>
         </View>
       ) : error ? (
         <View style={styles.centerContainer}>
-          <ThemedText>Error loading billing</ThemedText>
+          <ThemedText>{t("billing.errorLoadingBilling")}</ThemedText>
           <ThemedText style={styles.errorMessage}>
             {error instanceof Error ? error.message : "Unknown error"}
           </ThemedText>
         </View>
       ) : !data || !data.data.length ? (
         <View style={styles.centerContainer}>
-          <ThemedText>No billing found</ThemedText>
+          <ThemedText>{t("billing.noBillingFound")}</ThemedText>
         </View>
       ) : (
         <>

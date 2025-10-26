@@ -18,9 +18,11 @@ import { CityInput } from "../components/CityInput";
 import { BioInput } from "../components/BioInput";
 import { ImagePickerInput } from "../components/ImagePickerInput";
 import { AvailabilityButtons } from "../components/AvailabilityButtons";
+import { useTranslation } from "react-i18next";
 
 export function MasterSettingsView() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const userId = user?.id ?? "";
   const { data: profile } = useMasterProfileById(userId);
   const [selectedAvailability, setSelectedAvailability] = useState<
@@ -53,15 +55,15 @@ export function MasterSettingsView() {
   const onSubmit = (data: ProfileFormValues) => {
     upsert(data, {
       onSuccess: () => {
-        Alert.alert("Saved", "Profile updated successfully");
+        Alert.alert(t("common.success"), t("common.profileUpdated"));
         setValue("bio", "");
         setValue("city", "");
         setValue("image", null);
       },
       onError: (e: any) =>
         Alert.alert(
-          "Error",
-          e?.response?.data?.message || "Failed to update profile"
+          t("common.error"),
+          e?.response?.data?.message || t("common.updateFailed")
         ),
     });
   };
@@ -72,7 +74,9 @@ export function MasterSettingsView() {
       keyboardShouldPersistTaps="handled"
     >
       <ThemedView style={{ gap: 20 }}>
-        <ThemedText type="title">Profile Settings</ThemedText>
+        <ThemedText type="title">
+          {t("masterNavigation.profileSettings")}
+        </ThemedText>
 
         <CityInput setValue={setValue as any} error={errors.city?.message} />
         <BioInput setValue={setValue as any} error={errors.bio?.message} />
@@ -92,7 +96,7 @@ export function MasterSettingsView() {
           }}
         >
           <ThemedText style={{ color: "white" }}>
-            {upserting ? "Saving..." : "Save Profile"}
+            {upserting ? t("common.saving") : t("common.saveProfile")}
           </ThemedText>
         </TouchableOpacity>
 

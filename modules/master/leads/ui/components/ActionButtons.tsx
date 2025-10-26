@@ -4,6 +4,7 @@ import { ThemedText } from "@/components/themed-text";
 import { useAcceptDeclineLead } from "../../hooks/use-accept-decline-lead";
 import { LeadStatus } from "../../types";
 import { CompleteLeadModal } from "./CompleteLeadModal";
+import { useTranslation } from "react-i18next";
 
 interface ActionButtonsProps {
   leadId: string;
@@ -16,16 +17,14 @@ export function ActionButtons({
   status,
   onComplete,
 }: ActionButtonsProps) {
+  const { t } = useTranslation();
   const { mutate: acceptDeclineLead, isPending: isAcceptDeclinePending } =
     useAcceptDeclineLead();
   const [isCompleteModalVisible, setIsCompleteModalVisible] = useState(false);
 
   const handleAccept = () => {
     if (status !== "pending") {
-      Alert.alert(
-        "Cannot Accept",
-        "This lead cannot be accepted. Only pending leads can be accepted."
-      );
+      Alert.alert(t("leads.cannotAccept"), t("leads.cannotAcceptDescription"));
       return;
     }
     acceptDeclineLead(
@@ -33,8 +32,8 @@ export function ActionButtons({
       {
         onError: (error: any) => {
           const message =
-            error?.response?.data?.message || "Failed to accept lead";
-          Alert.alert("Error", message);
+            error?.response?.data?.message || t("leads.failedToAccept");
+          Alert.alert(t("common.error"), message);
         },
       }
     );
@@ -43,8 +42,8 @@ export function ActionButtons({
   const handleDecline = () => {
     if (status !== "pending") {
       Alert.alert(
-        "Cannot Decline",
-        "This lead cannot be declined. Only pending leads can be declined."
+        t("leads.cannotDecline"),
+        t("leads.cannotDeclineDescription")
       );
       return;
     }
@@ -53,8 +52,8 @@ export function ActionButtons({
       {
         onError: (error: any) => {
           const message =
-            error?.response?.data?.message || "Failed to decline lead";
-          Alert.alert("Error", message);
+            error?.response?.data?.message || t("leads.failedToDecline");
+          Alert.alert(t("common.error"), message);
         },
       }
     );
@@ -82,7 +81,7 @@ export function ActionButtons({
           activeOpacity={0.7}
         >
           <ThemedText style={styles.buttonText}>
-            {isAcceptDeclinePending ? "Accepting..." : "Accept"}
+            {isAcceptDeclinePending ? t("leads.accepting") : t("common.accept")}
           </ThemedText>
         </TouchableOpacity>
         <TouchableOpacity
@@ -92,7 +91,9 @@ export function ActionButtons({
           activeOpacity={0.7}
         >
           <ThemedText style={styles.buttonText}>
-            {isAcceptDeclinePending ? "Declining..." : "Decline"}
+            {isAcceptDeclinePending
+              ? t("leads.declining")
+              : t("common.decline")}
           </ThemedText>
         </TouchableOpacity>
       </View>
@@ -107,7 +108,7 @@ export function ActionButtons({
       <View style={styles.actionContainer}>
         <View style={styles.actionHeader}>
           <ThemedText type="subtitle" style={styles.actionTitle}>
-            Complete Lead
+            {t("leads.completeLead")}
           </ThemedText>
         </View>
         <TouchableOpacity
@@ -115,7 +116,9 @@ export function ActionButtons({
           onPress={handleOpenCompleteModal}
           activeOpacity={0.7}
         >
-          <ThemedText style={styles.buttonText}>Complete</ThemedText>
+          <ThemedText style={styles.buttonText}>
+            {t("common.complete")}
+          </ThemedText>
         </TouchableOpacity>
       </View>
     );
@@ -126,7 +129,7 @@ export function ActionButtons({
     return (
       <View style={styles.statusMessageContainer}>
         <ThemedText style={styles.statusMessage}>
-          ✓ This lead has been completed
+          ✓ {t("leads.leadCompleted")}
         </ThemedText>
       </View>
     );
@@ -136,7 +139,7 @@ export function ActionButtons({
     return (
       <View style={styles.statusMessageContainer}>
         <ThemedText style={styles.statusMessage}>
-          This lead has been declined
+          {t("leads.leadDeclined")}
         </ThemedText>
       </View>
     );

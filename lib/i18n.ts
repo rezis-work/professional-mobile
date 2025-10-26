@@ -1,6 +1,23 @@
-import "expo-router/entry";
-import "@formatjs/intl-pluralrules/polyfill";
-import "@formatjs/intl-pluralrules/locale-data/en";
-import "@formatjs/intl-pluralrules/locale-data/ka";
-import "@formatjs/intl-pluralrules/locale-data/ru";
-export {};
+import i18n from "i18next";
+import { initReactI18next } from "react-i18next";
+import en from "@/locales/en/common.json";
+import ka from "@/locales/ka/common.json";
+import ru from "@/locales/ru/common.json";
+
+const resources = {
+  en: { translation: en },
+  ka: { translation: ka },
+  ru: { translation: ru },
+};
+
+i18n.use(initReactI18next).init({
+  resources,
+  lng: "en", // default language
+  fallbackLng: "en",
+  interpolation: {
+    escapeValue: false,
+  },
+  compatibilityJSON: "v3",
+});
+
+export default i18n;

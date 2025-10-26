@@ -2,12 +2,15 @@ import { View, StyleSheet } from "react-native";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import type { Review } from "../../types";
+import { useTranslation } from "react-i18next";
 
 interface ReviewCardProps {
   review: Review;
 }
 
 export function ReviewCard({ review }: ReviewCardProps) {
+  const { t } = useTranslation();
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString();
@@ -51,32 +54,40 @@ export function ReviewCard({ review }: ReviewCardProps) {
         </View>
         {review.normalizedRating && (
           <ThemedText style={styles.normalizedText}>
-            Normalized: {review.normalizedRating}
+            {t("reviews.normalized")}: {review.normalizedRating}
           </ThemedText>
         )}
       </View>
 
       <View style={styles.ratingsGrid}>
         <View style={styles.ratingItem}>
-          <ThemedText style={styles.ratingLabel}>Price:</ThemedText>
+          <ThemedText style={styles.ratingLabel}>
+            {t("reviews.price")}:
+          </ThemedText>
           <ThemedText style={styles.ratingValue}>
             {review.ratingPrice}
           </ThemedText>
         </View>
         <View style={styles.ratingItem}>
-          <ThemedText style={styles.ratingLabel}>Quality:</ThemedText>
+          <ThemedText style={styles.ratingLabel}>
+            {t("reviews.quality")}:
+          </ThemedText>
           <ThemedText style={styles.ratingValue}>
             {review.ratingQuality}
           </ThemedText>
         </View>
         <View style={styles.ratingItem}>
-          <ThemedText style={styles.ratingLabel}>Punctuality:</ThemedText>
+          <ThemedText style={styles.ratingLabel}>
+            {t("reviews.punctuality")}:
+          </ThemedText>
           <ThemedText style={styles.ratingValue}>
             {review.ratingPunctuality}
           </ThemedText>
         </View>
         <View style={styles.ratingItem}>
-          <ThemedText style={styles.ratingLabel}>Experience:</ThemedText>
+          <ThemedText style={styles.ratingLabel}>
+            {t("reviews.experience")}:
+          </ThemedText>
           <ThemedText style={styles.ratingValue}>
             {review.ratingExperience}
           </ThemedText>
@@ -85,14 +96,18 @@ export function ReviewCard({ review }: ReviewCardProps) {
 
       {review.comment && (
         <View style={styles.commentSection}>
-          <ThemedText style={styles.sectionTitle}>Comment:</ThemedText>
+          <ThemedText style={styles.sectionTitle}>
+            {t("reviews.comment")}:
+          </ThemedText>
           <ThemedText style={styles.commentText}>{review.comment}</ThemedText>
         </View>
       )}
 
       {review.masterReply && (
         <View style={styles.replySection}>
-          <ThemedText style={styles.sectionTitle}>Your Reply:</ThemedText>
+          <ThemedText style={styles.sectionTitle}>
+            {t("reviews.yourReply")}:
+          </ThemedText>
           <ThemedText style={styles.replyText}>{review.masterReply}</ThemedText>
         </View>
       )}

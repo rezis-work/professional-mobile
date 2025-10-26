@@ -1,5 +1,6 @@
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
+import { useTranslation } from "react-i18next";
 
 export function LeadStatsCard({
   totalLeads,
@@ -16,15 +17,17 @@ export function LeadStatsCard({
   averageJobValue: number;
   totalRevenue: number | null;
 }) {
+  const { t } = useTranslation();
+
   return (
     <ThemedView style={{ borderRadius: 12, padding: 16, gap: 8 }}>
-      <ThemedText type="subtitle">Lead Stats</ThemedText>
-      <ThemedText>Total: {totalLeads}</ThemedText>
-      <ThemedText>Pending: {pendingLeads}</ThemedText>
-      <ThemedText>Accepted: {acceptedLeads}</ThemedText>
-      <ThemedText>Declined: {declinedLeads}</ThemedText>
-      <ThemedText>Avg Job Value: {averageJobValue}</ThemedText>
-      <ThemedText>Total Revenue: {totalRevenue ?? 0}</ThemedText>
+      <ThemedText type="subtitle">{t("profile.leadStats")}</ThemedText>
+      <ThemedText>{t("profile.total")}: {totalLeads}</ThemedText>
+      <ThemedText>{t("common.pending")}: {pendingLeads}</ThemedText>
+      <ThemedText>{t("profile.accepted")}: {acceptedLeads}</ThemedText>
+      <ThemedText>{t("profile.declined")}: {declinedLeads}</ThemedText>
+      <ThemedText>{t("profile.avgJobValue")}: {averageJobValue}</ThemedText>
+      <ThemedText>{t("profile.totalRevenue")}: {totalRevenue ?? 0}</ThemedText>
     </ThemedView>
   );
 }

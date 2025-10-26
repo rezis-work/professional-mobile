@@ -1,5 +1,6 @@
 import { ThemedText } from "@/components/themed-text";
 import { Image, View } from "react-native";
+import { useTranslation } from "react-i18next";
 
 export function ProfileHeader({
   displayName,
@@ -12,6 +13,8 @@ export function ProfileHeader({
   imageUrl: string | null;
   availability?: string | null;
 }) {
+  const { t } = useTranslation();
+
   return (
     <View style={{ alignItems: "center", marginBottom: 12 }}>
       {imageUrl ? (
@@ -25,9 +28,9 @@ export function ProfileHeader({
       </ThemedText>
       <ThemedText>{city || "-"}</ThemedText>
       {availability ? (
-        <ThemedText
-          style={{ marginTop: 4 }}
-        >{`Available ${availability}`}</ThemedText>
+        <ThemedText style={{ marginTop: 4 }}>
+          {t("profile.available")} {availability}
+        </ThemedText>
       ) : null}
     </View>
   );

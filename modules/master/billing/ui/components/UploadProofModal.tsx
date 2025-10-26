@@ -12,6 +12,7 @@ import {
 import { ThemedText } from "@/components/themed-text";
 import { useUploadProof } from "../../hooks/use-upload-proof";
 import * as ImagePicker from "expo-image-picker";
+import { useTranslation } from "react-i18next";
 
 interface UploadProofModalProps {
   visible: boolean;
@@ -24,6 +25,7 @@ export function UploadProofModal({
   onClose,
   billingId,
 }: UploadProofModalProps) {
+  const { t } = useTranslation();
   const [proofNote, setProofNote] = useState("");
   const [selectedImage, setSelectedImage] = useState<{
     uri: string;
@@ -41,8 +43,8 @@ export function UploadProofModal({
 
       if (status !== "granted") {
         Alert.alert(
-          "Permission required",
-          "Please grant permission to access your photos"
+          t("settings.permissionRequired"),
+          t("settings.permissionRequired")
         );
         return;
       }
@@ -64,23 +66,23 @@ export function UploadProofModal({
       }
     } catch (error) {
       console.error("Error in handlePickImage:", error);
-      Alert.alert("Error", "Failed to pick image. Please try again.");
+      Alert.alert(t("common.error"), t("billing.failedToPickImage"));
     }
   };
 
   const handleUpload = async () => {
     if (!proofNote.trim()) {
-      Alert.alert("Error", "Please enter a proof note");
+      Alert.alert(t("common.error"), t("billing.noteRequired"));
       return;
     }
 
     if (proofNote.trim().length < 10) {
-      Alert.alert("Error", "Proof note must be at least 10 characters long");
+      Alert.alert(t("common.error"), t("billing.invalidNoteLength"));
       return;
     }
 
     if (!selectedImage) {
-      Alert.alert("Error", "Please select an image");
+      Alert.alert(t("common.error"), t("billing.imageRequired"));
       return;
     }
 
@@ -105,7 +107,7 @@ export function UploadProofModal({
       });
     } catch (error) {
       console.error("Error uploading proof:", error);
-      Alert.alert("Error", "Failed to upload proof. Please try again.");
+      Alert.alert(t("common.error"), t("billing.uploadFailed"));
     }
   };
 
@@ -126,13 +128,17 @@ export function UploadProofModal({
     >
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
-          <ThemedText style={styles.modalTitle}>Upload Proof</ThemedText>
+          <ThemedText style={styles.modalTitle}>
+            {t("billing.uploadProof")}
+          </ThemedText>
 
           <View style={styles.inputSection}>
-            <ThemedText style={styles.label}>Proof Note</ThemedText>
+            <ThemedText style={styles.label}>
+              {t("billing.proofNote")}
+            </ThemedText>
             <TextInput
               style={styles.textInput}
-              placeholder="Enter proof note"
+              placeholder={t("billing.enterProofNote")}
               placeholderTextColor="#9ca3af"
               value={proofNote}
               onChangeText={setProofNote}
@@ -143,7 +149,9 @@ export function UploadProofModal({
           </View>
 
           <View style={styles.imageSection}>
-            <ThemedText style={styles.label}>Proof Image</ThemedText>
+            <ThemedText style={styles.label}>
+              {t("billing.selectImage")}
+            </ThemedText>
             {selectedImage ? (
               <View>
                 <Image
@@ -156,7 +164,7 @@ export function UploadProofModal({
                   disabled={isPending}
                 >
                   <ThemedText style={styles.removeButtonText}>
-                    Remove
+                    {t("billing.remove")}
                   </ThemedText>
                 </TouchableOpacity>
               </View>
@@ -167,12 +175,12 @@ export function UploadProofModal({
                 disabled={isPending}
               >
                 <ThemedText style={styles.selectButtonText}>
-                  Select Image
+                  {t("billing.selectImage")}
                 </ThemedText>
               </TouchableOpacity>
             )}
             <ThemedText style={styles.hint}>
-              JPG, PNG, SVG or JPEG, max 1mb
+              {t("billing.proofNoteHint")}
             </ThemedText>
           </View>
 
@@ -182,7 +190,9 @@ export function UploadProofModal({
               onPress={handleClose}
               disabled={isPending}
             >
-              <ThemedText style={styles.cancelButtonText}>Cancel</ThemedText>
+              <ThemedText style={styles.cancelButtonText}>
+                {t("common.cancel")}
+              </ThemedText>
             </TouchableOpacity>
             <TouchableOpacity
               style={[
@@ -197,7 +207,7 @@ export function UploadProofModal({
                 <ActivityIndicator color="#fff" />
               ) : (
                 <ThemedText style={styles.uploadButtonText}>
-                  Upload Proof
+                  {t("billing.uploadProof")}
                 </ThemedText>
               )}
             </TouchableOpacity>

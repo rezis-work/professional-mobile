@@ -7,8 +7,10 @@ import { StatusFilter } from "../components/StatusFilter";
 import { useGetLeadsList } from "../../hooks/use-get-leads-list";
 import { LeadStatus } from "../../types";
 import { Pagination } from "@/components/Pagination";
+import { useTranslation } from "react-i18next";
 
 export function LeadsListView() {
+  const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState<LeadStatus>(LeadStatus.UNDEFINED);
   const limit = 4;
@@ -33,16 +35,16 @@ export function LeadsListView() {
 
       {isLoading ? (
         <View style={styles.centerContainer}>
-          <ThemedText>Loading leads...</ThemedText>
+          <ThemedText>{t("leads.loadingLeads")}</ThemedText>
         </View>
       ) : error ? (
         <View style={styles.centerContainer}>
-          <ThemedText>Error loading leads</ThemedText>
+          <ThemedText>{t("leads.errorLoadingLeads")}</ThemedText>
           <ThemedText>{error.message}</ThemedText>
         </View>
       ) : !data || !data.data.leads.length ? (
         <View style={styles.centerContainer}>
-          <ThemedText>No leads found</ThemedText>
+          <ThemedText>{t("common.noData")}</ThemedText>
         </View>
       ) : (
         <>
