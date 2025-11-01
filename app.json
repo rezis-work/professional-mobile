@@ -1,36 +1,43 @@
 {
   "expo": {
-    "name": "professional-mobile",
-    "slug": "professional-mobile",
+    "name": "professionalss",
+    "slug": "professionals",
+    "description": "Professionals is a platform for finding professionals in your area. offering all the services you need.",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "scheme": "professionalmobile",
+    "icon": "./assets/images/main-logo.png",
+    "scheme": "professionals",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.rezinio.professionals",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "foregroundImage": "./assets/images/main-logo.png",
+        "backgroundImage": "./assets/images/main-logo.png",
+        "monochromeImage": "./assets/images/main-logo.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": ["android.permission.RECORD_AUDIO"],
+      "package": "com.rezinio.professionalmobile"
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/main-logo.png"
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/main-logo.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff",
@@ -51,7 +58,11 @@
       "reactCompiler": true
     },
     "extra": {
-      "API_URL": "https://backend-ancient-water-2623.fly.dev"
+      "API_URL": "https://backend-ancient-water-2623.fly.dev",
+      "router": {},
+      "eas": {
+        "projectId": "a31e7908-becf-475c-9829-38f73e1f6884"
+      }
     }
   }
 }
