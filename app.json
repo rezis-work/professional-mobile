@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "professionalss",
-    "slug": "professionals",
-    "description": "Professionals is a platform for finding professionals in your area. offering all the services you need.",
+    "name": "professional-mobile",
+    "slug": "professional-mobile",
+    "description": "professional-mobile is a platform for finding professionals in your area. offering all the services you need.",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/main-logo.png",
