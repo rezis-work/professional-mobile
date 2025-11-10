@@ -61,7 +61,7 @@
       "reactCompiler": true
     },
     "extra": {
-      "API_URL": "https://backend-ancient-water-2623.fly.dev",
+      "API_URL": "https://marcelino-uncombative-jason.ngrok-free.dev",
       "router": {},
       "eas": {
         "projectId": "a31e7908-becf-475c-9829-38f73e1f6884"
