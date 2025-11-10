@@ -25,7 +25,9 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "permissions": ["android.permission.RECORD_AUDIO"],
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ],
       "package": "com.rezinio.professionalmobile"
     },
     "web": {
@@ -51,7 +53,8 @@
         {
           "photosPermission": "The app accesses your photos to let you upload proof for billing."
         }
-      ]
+      ],
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true,
