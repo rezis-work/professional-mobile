@@ -1,16 +1,16 @@
+import { useColorScheme } from "@/hooks/use-color-scheme";
+import { AuthProvider } from "@/lib/auth";
+import "@/lib/i18n";
 import {
   DarkTheme,
   DefaultTheme,
   ThemeProvider,
 } from "@react-navigation/native";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { AuthProvider } from "@/lib/auth";
-
-import { useColorScheme } from "@/hooks/use-color-scheme";
-import "@/lib/i18n";
+import "../global.css";
 
 export const unstable_settings = {
   anchor: "(auth)",
