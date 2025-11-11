@@ -1,7 +1,3 @@
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
-import api from "@/lib/api";
-import { logger } from "@/lib/logger";
 import { Feather } from "@expo/vector-icons";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
@@ -12,12 +8,16 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Platform,
-  StyleSheet,
+  Text,
   TextInput,
   TouchableOpacity,
-  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
+import api from "@/lib/api";
+import { logger } from "@/lib/logger";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -43,7 +43,6 @@ export default function LoginScreen() {
       logger.error("Login failed", err);
 
       let message = "Something went wrong. Please try again.";
-
       const issues = err?.response?.data?.issues;
 
       if (Array.isArray(issues) && issues.length > 0) {
@@ -66,75 +65,84 @@ export default function LoginScreen() {
   });
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#f9fafb" }}>
+    <SafeAreaView className="flex-1">
       <KeyboardAvoidingView
-        style={styles.keyboardView}
+        className="flex-1"
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-        <ThemedView style={styles.container}>
-          <View style={styles.header}>
-            <ThemedText style={styles.title}>Professional</ThemedText>
-            <ThemedText style={styles.subtitle}>
+        <ThemedView className="flex-1 justify-center px-6">
+          {/* Header */}
+          <ThemedView className="mb-8">
+            <ThemedText type="title">Professional</ThemedText>
+            <ThemedText type="default" className="mt-1 opacity-70">
               Sign in to access the dashboard
             </ThemedText>
-          </View>
+          </ThemedView>
 
-          <View style={styles.inputWrapper}>
-            <View style={styles.inputContainer}>
+          {/* Inputs */}
+          <ThemedView className="gap-3 pb-10 relative">
+            {/* Email */}
+            <ThemedView className="flex-row items-center rounded-xl px-4 border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800">
               <Feather
                 name="mail"
                 size={20}
                 color="#9ca3af"
-                style={styles.icon}
+                style={{ marginRight: 8 }}
               />
               <TextInput
                 placeholder="Email"
                 placeholderTextColor="#9ca3af"
                 keyboardType="email-address"
                 autoCapitalize="none"
-                style={styles.input}
                 value={email}
                 onChangeText={setEmail}
+                className="flex-1 py-4 text-base text-neutral-900 dark:text-neutral-100"
               />
-            </View>
+            </ThemedView>
 
-            <View style={styles.inputContainer}>
+            {/* Password */}
+            <ThemedView className="flex-row items-center rounded-xl px-4 border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800">
               <Feather
                 name="key"
                 size={20}
                 color="#9ca3af"
-                style={styles.icon}
+                style={{ marginRight: 8 }}
               />
               <TextInput
                 placeholder="Password"
                 placeholderTextColor="#9ca3af"
                 secureTextEntry
-                style={styles.input}
                 value={password}
                 onChangeText={setPassword}
                 returnKeyType="done"
-                onSubmitEditing={() => {
-                  Keyboard.dismiss();
-                }}
+                onSubmitEditing={() => Keyboard.dismiss()}
+                className="flex-1 py-4 text-base text-neutral-900 dark:text-neutral-100"
               />
-            </View>
-
+            </ThemedView>
+            {/* Error message */}
             {error ? (
-              <ThemedText style={styles.errorText}>{error}</ThemedText>
+              <Text className="text-red-500 text-sm  absolute bottom-4 left-1 ">
+                {error}
+              </Text>
             ) : (
-              <ThemedText style={styles.errorText}></ThemedText>
+              null
             )}
-          </View>
+          </ThemedView>
 
+          {/* Button */}
           <TouchableOpacity
-            style={[styles.button, isPending && styles.disabled]}
+            className={`w-full py-4 rounded-xl items-center shadow-md ${
+              isPending ? "bg-blue-400" : "bg-blue-600"
+            }`}
             onPress={() => mutate()}
             disabled={isPending}
           >
             {isPending ? (
               <ActivityIndicator color="#fff" />
             ) : (
-              <ThemedText style={styles.buttonText}>Sign In</ThemedText>
+              <ThemedText style={{ color: "#fff", fontWeight: "600" }}>
+                Sign In
+              </ThemedText>
             )}
           </TouchableOpacity>
         </ThemedView>
@@ -142,84 +150,3 @@ export default function LoginScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  keyboardView: {
-    flex: 1,
-  },
-  container: {
-    flex: 1,
-    paddingHorizontal: 24,
-    justifyContent: "center",
-    backgroundColor: "#f9fafb", // soft neutral background
-  },
-  header: {
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "700",
-    color: "#111827",
-    marginTop: 8,
-    paddingTop: 3,
-  },
-  subtitle: {
-    color: "#6b7280",
-    fontSize: 15,
-    marginTop: 4,
-  },
-  inputWrapper: {
-    width: "100%",
-    gap: 16,
-    marginBottom: 20,
-  },
-  inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#fff",
-    borderRadius: 14,
-    paddingHorizontal: 14,
-    borderWidth: 1,
-    borderColor: "#e5e7eb",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 2,
-  },
-  icon: {
-    marginRight: 10,
-  },
-  input: {
-    flex: 1,
-    color: "#111827",
-    fontSize: 16,
-    paddingVertical: 14,
-  },
-  button: {
-    width: "100%",
-    backgroundColor: "#2563eb",
-    paddingVertical: 16,
-    borderRadius: 14,
-    alignItems: "center",
-    shadowColor: "#2563eb",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.25,
-    shadowRadius: 5,
-    elevation: 5,
-  },
-  disabled: {
-    opacity: 0.7,
-  },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "700",
-    fontSize: 16,
-  },
-  errorText: {
-    color: "#ef4444",
-    textAlign: "left",
-    marginLeft: 5,
-    fontWeight: "400",
-  },
-});

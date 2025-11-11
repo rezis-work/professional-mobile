@@ -1,14 +1,34 @@
-import { View, type ViewProps } from 'react-native';
+import { useThemeColor } from "@/hooks/use-theme-color";
+import { View } from "react-native";
 
-import { useThemeColor } from '@/hooks/use-theme-color';
-
-export type ThemedViewProps = ViewProps & {
+export type ThemedViewProps = React.ComponentProps<typeof View> & {
   lightColor?: string;
   darkColor?: string;
 };
 
-export function ThemedView({ style, lightColor, darkColor, ...otherProps }: ThemedViewProps) {
-  const backgroundColor = useThemeColor({ light: lightColor, dark: darkColor }, 'background');
+/**
+ * ThemedView — supports both NativeWind className styling and
+ * dynamic light/dark background colors when no className is provided.
+ */
 
-  return <View style={[{ backgroundColor }, style]} {...otherProps} />;
+export function ThemedView({
+  style,
+  className,
+  lightColor,
+  darkColor,
+  ...otherProps
+}: ThemedViewProps) {
+  const backgroundColor = useThemeColor(
+    { light: lightColor, dark: darkColor },
+    "background"
+  );
+
+  // If user provides Tailwind classes, NativeWind handles dark mode automatically
+  return (
+    <View
+      className={className}
+      style={[!className && { backgroundColor }, style]}
+      {...otherProps}
+    />
+  );
 }
