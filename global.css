@@ -1,3 +1,35 @@
 @import "tailwindcss/base";
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box; 
+}
+
+
+:root {
+  --color-text: #11181C;
+  --color-background: #fff;
+  --color-tint: #0a7ea4;
+  --color-icon: #687076;
+  --color-tabIconDefault: #687076;
+  --color-tabIconSelected: #0a7ea4;
+  --color-input-background: #fff;
+  --color-input-border: #d4d4d4; 
+}
+
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-text: #ECEDEE;
+    --color-background: #151718;
+    --color-tint: #fff;
+    --color-icon: #9BA1A6;
+    --color-tabIconDefault: #9BA1A6;
+    --color-tabIconSelected: #fff;
+    --color-input-background: #27272a;
+    --color-input-border: #404040;
+  }
+}

@@ -1,5 +1,3 @@
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
 import api from "@/lib/api";
 import { logger } from "@/lib/logger";
 import { Feather } from "@expo/vector-icons";
@@ -15,6 +13,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  View, // 👈 ThemedView-ს მაგივრად
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -25,10 +24,12 @@ export default function LoginScreen() {
   const [password, setPassword] = React.useState("");
   const [error, setError] = React.useState("");
   const translateY = useRef(new Animated.Value(0)).current;
-  const showEvent =
-    Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
-  const hideEvent =
-    Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
+  const isAndroid = Platform.OS === "android";
+  const showEvent = isAndroid ? "keyboardDidShow" : "keyboardWillShow";
+  const hideEvent = isAndroid ? "keyboardDidHide" : "keyboardWillHide";
+
+  const emailRef = useRef<TextInput>(null);
+  const passwordRef = useRef<TextInput>(null);
 
   const { mutate, isPending } = useMutation({
     mutationFn: async () => {
@@ -62,7 +63,7 @@ export default function LoginScreen() {
     },
   });
 
-  // animation for Keyboard handling
+  // Smooth keyboard animation
   useEffect(() => {
     const showSub = Keyboard.addListener(showEvent, (e: KeyboardEvent) => {
       Animated.timing(translateY, {
@@ -86,72 +87,80 @@ export default function LoginScreen() {
   }, [translateY]);
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView className="flex-1 bg-background">
       <Animated.View
+        className="flex-1 justify-center px-6"
         style={{
-          flex: 1,
-          justifyContent: "center",
-          paddingHorizontal: 24,
           transform: [{ translateY }],
         }}
       >
-        <ThemedView className="mb-8">
-          <ThemedText type="title">Professional</ThemedText>
-          <ThemedText type="default" className="mt-1 opacity-70">
+        <View className="mb-8">
+          <Text className="text-3xl font-bold text-text font-sans">
+            Professional
+          </Text>
+          <Text className="mt-1 opacity-70 text-base text-text font-sans">
             Sign in to access the dashboard
-          </ThemedText>
-        </ThemedView>
+          </Text>
+        </View>
 
         {/* Inputs */}
-        <ThemedView className="gap-3 pb-10 relative">
-          <ThemedView className="flex-row items-center rounded-xl px-4 border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800">
-            <Feather
-              name="mail"
-              size={20}
-              color="#9ca3af"
-              style={{ marginRight: 8 }}
-            />
+        <View className="gap-3 pb-10 relative">
+          {/* EMAIL */}
+          <View
+            className="flex-row items-center rounded-xl px-4 border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800"
+            onTouchEnd={() => emailRef.current?.focus()}
+          >
+            <Feather name="mail" size={20} color="#9ca3af" className="mr-2" />
             <TextInput
+              ref={emailRef}
               placeholder="Email"
+              autoCapitalize="none"
               placeholderTextColor="#9ca3af"
               keyboardType="email-address"
-              autoCapitalize="none"
               value={email}
               onChangeText={setEmail}
-              className="flex-1 py-4 text-base text-neutral-900 dark:text-neutral-100"
+              returnKeyType="next"
+              onSubmitEditing={() => passwordRef.current?.focus()}
+              className="flex-1 h-11 text-base text-text font-sans"
+              style={{
+                paddingVertical: 0,
+                includeFontPadding: false,
+                textAlignVertical: "center",
+              }}
             />
-          </ThemedView>
+          </View>
 
-          <ThemedView className="flex-row items-center rounded-xl px-4 border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800">
-            <Feather
-              name="key"
-              size={20}
-              color="#9ca3af"
-              style={{ marginRight: 8 }}
-            />
+          {/* PASSWORD */}
+          <View
+            className="flex-row items-center rounded-xl px-4 border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800"
+            onTouchEnd={() => passwordRef.current?.focus()}
+          >
+            <Feather name="key" size={20} color="#9ca3af" className="mr-2" />
             <TextInput
+              ref={passwordRef}
               placeholder="Password"
               placeholderTextColor="#9ca3af"
               secureTextEntry
               value={password}
               onChangeText={setPassword}
               returnKeyType="done"
-              onSubmitEditing={() => {
-                Keyboard.dismiss;
-                mutate();
+              onSubmitEditing={() => Keyboard.dismiss()}
+              className="flex-1 h-11 text-base text-text font-sans"
+              style={{
+                paddingVertical: 0,
+                textAlignVertical: "center",
               }}
-              className="flex-1 py-4 text-base text-neutral-900 dark:text-neutral-100"
             />
-          </ThemedView>
+          </View>
 
           {error ? (
-            <Text className="text-red-500 text-sm absolute bottom-4 left-1">
+            <Text className="text-red-500 text-sm absolute bottom-4 left-1 font-sans">
               {error}
             </Text>
           ) : null}
-        </ThemedView>
+        </View>
 
-        {/* Button */}
+        {/* BUTTON */}
         <TouchableOpacity
           className={`w-full py-4 rounded-xl items-center shadow-md ${
             isPending ? "bg-blue-400" : "bg-blue-600"
@@ -162,9 +171,9 @@ export default function LoginScreen() {
           {isPending ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <ThemedText style={{ color: "#fff", fontWeight: "600" }}>
+            <Text className="text-white font-semibold text-base font-sans">
               Sign In
-            </ThemedText>
+            </Text>
           )}
         </TouchableOpacity>
       </Animated.View>
