@@ -1,24 +1,17 @@
-import { ThemedView } from "@/components/themed-view";
-import { ThemedText } from "@/components/themed-text";
-import { TouchableOpacity, View, Alert, ScrollView } from "react-native";
-import { useEffect, useState } from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import {
-  availabilitySchema,
-  profileSchema,
-  type ProfileFormValues,
-  type AvailabilityFormValues,
-} from "../../schema";
-import { useUpsertProfile } from "../../hooks/useUpsertProfile";
-import { useUpdateAvailability } from "../../hooks/useUpdateAvailability";
 import { useAuth } from "@/lib/auth";
-import { useMasterProfileById } from "../../hooks/useMasterProfileById";
-import { CityInput } from "../components/CityInput";
-import { BioInput } from "../components/BioInput";
-import { ImagePickerInput } from "../components/ImagePickerInput";
-import { AvailabilityButtons } from "../components/AvailabilityButtons";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { useMasterProfileById } from "../../hooks/useMasterProfileById";
+import { useUpdateAvailability } from "../../hooks/useUpdateAvailability";
+import { useUpsertProfile } from "../../hooks/useUpsertProfile";
+import { profileSchema, type ProfileFormValues } from "../../schema";
+import { AvailabilityButtons } from "../components/AvailabilityButtons";
+import { BioInput } from "../components/BioInput";
+import { CityInput } from "../components/CityInput";
+import { ImagePickerInput } from "../components/ImagePickerInput";
 
 export function MasterSettingsView() {
   const { user } = useAuth();
@@ -70,13 +63,10 @@ export function MasterSettingsView() {
 
   return (
     <ScrollView
-      contentContainerStyle={{ padding: 16 }}
+      contentContainerClassName="p-4"
       keyboardShouldPersistTaps="handled"
     >
-      <ThemedView style={{ gap: 20 }}>
-        <ThemedText type="title">
-          {t("masterNavigation.profileSettings")}
-        </ThemedText>
+      <View className="gap-5">
 
         <CityInput setValue={setValue as any} error={errors.city?.message} />
         <BioInput setValue={setValue as any} error={errors.bio?.message} />
@@ -88,21 +78,17 @@ export function MasterSettingsView() {
         <TouchableOpacity
           onPress={handleSubmit(onSubmit)}
           disabled={upserting || isSubmitting}
-          style={{
-            backgroundColor: "#2D5BE3",
-            padding: 14,
-            borderRadius: 8,
-            alignItems: "center",
-          }}
+          // 👈 style -> className (p-3.5 = 14px, rounded-lg = 8px)
+          className="bg-[#2D5BE3] p-3.5 rounded-lg items-center"
         >
-          <ThemedText style={{ color: "white" }}>
+          {/* 👈 ThemedText -> Text, style -> className */}
+          <Text className="text-white font-sans">
             {upserting ? t("common.saving") : t("common.saveProfile")}
-          </ThemedText>
+          </Text>
         </TouchableOpacity>
 
-        <View
-          style={{ height: 1, backgroundColor: "#eee", marginVertical: 10 }}
-        />
+        {/* 👈 გამყოფი ხაზი NativeWind-ზე, თემის მხარდაჭერით */}
+        <View className="h-px bg-neutral-200 dark:bg-neutral-700 my-2.5" />
 
         <AvailabilityButtons
           value={selectedAvailability}
@@ -111,7 +97,7 @@ export function MasterSettingsView() {
             updAvail(key);
           }}
         />
-      </ThemedView>
+      </View>
     </ScrollView>
   );
 }

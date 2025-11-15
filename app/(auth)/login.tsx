@@ -13,9 +13,18 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View, // 👈 ThemedView-ს მაგივრად
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { z } from "zod"; // 👈 1. Import Zod
+
+// 👈 2. Define the validation schema
+const loginSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+  password: z
+    .string()
+    .min(6, "Password must be at least 6 characters long"),
+});
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -62,6 +71,29 @@ export default function LoginScreen() {
       setError(message);
     },
   });
+
+  // 👈 3. Create a handler function for login
+  const handleLogin = () => {
+    // Clear any previous errors
+    setError("");
+
+    // Validate the inputs using Zod
+    const validation = loginSchema.safeParse({ email, password });
+
+    // If validation fails, show the first error and stop
+    if (!validation.success) {
+      const formattedErrors = validation.error.format();
+      if (formattedErrors.email) {
+        setError(formattedErrors.email._errors[0]);
+      } else if (formattedErrors.password) {
+        setError(formattedErrors.password._errors[0]);
+      }
+      return;
+    }
+
+    // If validation succeeds, call mutate
+    mutate();
+  };
 
   // Smooth keyboard animation
   useEffect(() => {
@@ -121,10 +153,9 @@ export default function LoginScreen() {
               onChangeText={setEmail}
               returnKeyType="next"
               onSubmitEditing={() => passwordRef.current?.focus()}
-              className="flex-1 h-11 text-base text-text font-sans"
+              className="flex-1  text-[16px] text-text font-sans"
               style={{
-                paddingVertical: 0,
-                includeFontPadding: false,
+                paddingVertical: 10,
                 textAlignVertical: "center",
               }}
             />
@@ -144,10 +175,10 @@ export default function LoginScreen() {
               value={password}
               onChangeText={setPassword}
               returnKeyType="done"
-              onSubmitEditing={() => Keyboard.dismiss()}
-              className="flex-1 h-11 text-base text-text font-sans"
+              onSubmitEditing={handleLogin} // 👈 Can also trigger login on submit
+              className="flex-1 text-[16px] text-text font-sans"
               style={{
-                paddingVertical: 0,
+                paddingVertical: 12,
                 textAlignVertical: "center",
               }}
             />
@@ -165,7 +196,7 @@ export default function LoginScreen() {
           className={`w-full py-4 rounded-xl items-center shadow-md ${
             isPending ? "bg-blue-400" : "bg-blue-600"
           }`}
-          onPress={() => mutate()}
+          onPress={handleLogin} // 👈 4. Update the onPress handler
           disabled={isPending}
         >
           {isPending ? (

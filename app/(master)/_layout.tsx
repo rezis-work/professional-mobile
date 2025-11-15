@@ -1,8 +1,9 @@
-import { Redirect, Tabs } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useAuth } from "@/lib/auth";
+import { Ionicons } from "@expo/vector-icons";
+import { Redirect, Tabs } from "expo-router";
 import { useTranslation } from "react-i18next";
+import { TouchableOpacity } from "react-native"; // 👈 დაემატა იმპორტი
 
 export default function MasterLayout() {
   const { t } = useTranslation();
@@ -15,25 +16,37 @@ export default function MasterLayout() {
 
   return (
     <Tabs
-      screenOptions={{
+      screenOptions={({ navigation }) => ({
+        // 👈 გადაკეთდა ფუნქციად
         headerShown: true,
         tabBarActiveTintColor: tint,
         tabBarInactiveTintColor: text,
         tabBarStyle: { backgroundColor: background },
         headerStyle: { backgroundColor: background },
-        headerTitleStyle: { color: text },
-      }}
+        headerTitleStyle: { color: text }, // 👇 დაემატა უკან დაბრუნების ღილაკი
+        headerLeft: () =>
+          navigation.canGoBack() ? ( // 👈 ვამოწმებთ, თუ შესაძლებელია უკან დაბრუნება
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={{ marginLeft: 16 }} // 👈 მცირე დაშორება მარცხნიდან
+            >
+              <Ionicons name="chevron-back" size={24} color={tint} />
+            </TouchableOpacity>
+          ) : null, // 👈 თუ არადა, არ ვაჩვენებთ ღილაკს
+      })}
     >
       <Tabs.Screen
         name="index"
         options={{
           title: t("masterNavigation.dashboard"),
           tabBarLabel: t("masterNavigation.dashboard"),
+          headerLeft: () => null,
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home" size={size} color={color} />
           ),
         }}
       />
+
       <Tabs.Screen
         name="master-profile"
         options={{
@@ -44,16 +57,20 @@ export default function MasterLayout() {
           ),
         }}
       />
+
       <Tabs.Screen
         name="settings"
         options={{
+          // 👈 სათაური უკვე აქედან იკითხება
           title: t("masterNavigation.profileSettings"),
           tabBarLabel: t("masterNavigation.profileSettings"),
+
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="settings" size={size} color={color} />
           ),
         }}
       />
+
       <Tabs.Screen
         name="job-assignment"
         options={{
@@ -64,6 +81,7 @@ export default function MasterLayout() {
           ),
         }}
       />
+
       <Tabs.Screen
         name="unlock-city"
         options={{
@@ -74,6 +92,7 @@ export default function MasterLayout() {
           ),
         }}
       />
+
       <Tabs.Screen
         name="unlocked-cities"
         options={{
@@ -84,6 +103,7 @@ export default function MasterLayout() {
           ),
         }}
       />
+
       <Tabs.Screen
         name="leads"
         options={{
@@ -94,12 +114,14 @@ export default function MasterLayout() {
           ),
         }}
       />
+
       <Tabs.Screen
         name="leads/[id]"
         options={{
-          href: null, // Hide from tab bar
+          href: null,
         }}
       />
+
       <Tabs.Screen
         name="notifications"
         options={{
@@ -110,6 +132,7 @@ export default function MasterLayout() {
           ),
         }}
       />
+
       <Tabs.Screen
         name="reviews"
         options={{
@@ -120,6 +143,7 @@ export default function MasterLayout() {
           ),
         }}
       />
+
       <Tabs.Screen
         name="billing"
         options={{
