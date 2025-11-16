@@ -1,6 +1,6 @@
-import { Text, View } from "react-native";
-import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
+import { Text, View } from "react-native";
 
 export function LeadStatsCard({
   totalLeads,
@@ -20,12 +20,42 @@ export function LeadStatsCard({
   const { t } = useTranslation();
 
   const stats = [
-    { label: t("profile.total"), value: totalLeads, icon: "list" as const, color: "#2563eb" },
-    { label: t("common.pending"), value: pendingLeads, icon: "time-outline" as const, color: "#f59e0b" },
-    { label: t("profile.accepted"), value: acceptedLeads, icon: "checkmark-circle" as const, color: "#10b981" },
-    { label: t("profile.declined"), value: declinedLeads, icon: "close-circle" as const, color: "#ef4444" },
-    { label: t("profile.avgJobValue"), value: `₾${averageJobValue}`, icon: "cash-outline" as const, color: "#8b5cf6" },
-    { label: t("profile.totalRevenue"), value: `₾${totalRevenue ?? 0}`, icon: "wallet-outline" as const, color: "#06b6d4" },
+    {
+      label: t("profile.total"),
+      value: totalLeads,
+      icon: "list" as const,
+      color: "#2563eb",
+    },
+    {
+      label: t("common.pending"),
+      value: pendingLeads,
+      icon: "time-outline" as const,
+      color: "#f59e0b",
+    },
+    {
+      label: t("profile.accepted"),
+      value: acceptedLeads,
+      icon: "checkmark-circle" as const,
+      color: "#10b981",
+    },
+    {
+      label: t("profile.declined"),
+      value: declinedLeads,
+      icon: "close-circle" as const,
+      color: "#ef4444",
+    },
+    {
+      label: t("profile.avgJobValue"),
+      value: `₾${averageJobValue}`,
+      icon: "cash-outline" as const,
+      color: "#8b5cf6",
+    },
+    {
+      label: t("profile.totalRevenue"),
+      value: `₾${totalRevenue ?? 0}`,
+      icon: "wallet-outline" as const,
+      color: "#06b6d4",
+    },
   ];
 
   return (
@@ -63,7 +93,10 @@ export function LeadStatsCard({
               >
                 <Ionicons name={stat.icon} size={16} color={stat.color} />
               </View>
-              <Text className="text-xs font-semibold text-gray-600 dark:text-gray-400 flex-1" numberOfLines={1}>
+              <Text
+                className="text-xs font-semibold text-gray-600 dark:text-gray-400 flex-1"
+                numberOfLines={1}
+              >
                 {stat.label}
               </Text>
             </View>

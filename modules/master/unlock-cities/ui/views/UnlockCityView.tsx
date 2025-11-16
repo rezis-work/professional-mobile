@@ -1,11 +1,12 @@
 import { ScreenHeader } from "@/components/ScreenHeader";
-import { useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { useState } from "react";
+import { ScrollView, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useGetCities } from "../../hooks/useGetCities";
 import { useGetCityPart } from "../../hooks/useGetCityPart";
 import { useUnlockCity } from "../../hooks/useUnlockCity";
+import type { City, CityPart } from "../../types";
 import { CitiesGrid } from "../components/CitiesGrid";
 import { CityPartsGrid } from "../components/CityPartsGrid";
 import {
@@ -13,7 +14,6 @@ import {
   UnlockNoData,
   UnlockSkeleton,
 } from "../components/States";
-import type { City, CityPart } from "../../types";
 
 export function UnlockCityView() {
   const { data, isLoading, isError, error } = useGetCities();
@@ -52,7 +52,11 @@ export function UnlockCityView() {
   return (
     <SafeAreaView className="flex-1 bg-background" edges={["top"]}>
       <ScreenHeader
-        title={selectedCityId && selectedCity ? `${selectedCity.name} Areas` : "Unlock Cities"}
+        title={
+          selectedCityId && selectedCity
+            ? `${selectedCity.name} Areas`
+            : "Unlock Cities"
+        }
         showBack={!!selectedCityId}
         onBack={onBack}
       />

@@ -1,6 +1,6 @@
-import { Text, View } from "react-native";
-import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
+import { Text, View } from "react-native";
 
 export function BioCard({ bio }: { bio: string | null }) {
   const { t } = useTranslation();

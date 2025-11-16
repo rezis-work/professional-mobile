@@ -1,7 +1,7 @@
-import { ActivityIndicator, Image, Text, View } from "react-native";
-import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { ActivityIndicator, Image, Text, View } from "react-native";
 
 function AvatarImage({ imageUrl }: { imageUrl: string }) {
   const [isLoading, setIsLoading] = useState(true);
