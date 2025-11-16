@@ -1,52 +1,62 @@
 import api from "@/lib/api";
 import { logger } from "@/lib/logger";
-import { Feather } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import {
   ActivityIndicator,
   Animated,
   Keyboard,
   KeyboardEvent,
   Platform,
+  Pressable,
+  ScrollView,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { z } from "zod"; // 👈 1. Import Zod
-
-// 👈 2. Define the validation schema
-const loginSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
-  password: z
-    .string()
-    .min(6, "Password must be at least 6 characters long"),
-});
+import { loginSchema, type LoginFormData } from "./schema";
 
 export default function LoginScreen() {
   const router = useRouter();
   const qc = useQueryClient();
-  const [email, setEmail] = React.useState("");
-  const [password, setPassword] = React.useState("");
-  const [error, setError] = React.useState("");
+  const [apiError, setApiError] = useState("");
   const translateY = useRef(new Animated.Value(0)).current;
   const isAndroid = Platform.OS === "android";
   const showEvent = isAndroid ? "keyboardDidShow" : "keyboardWillShow";
   const hideEvent = isAndroid ? "keyboardDidHide" : "keyboardWillHide";
 
-  const emailRef = useRef<TextInput>(null);
-  const passwordRef = useRef<TextInput>(null);
+  const passwordInputRef = useRef<TextInput>(null);
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    mode: "onSubmit", // Validation on submit
+    reValidateMode: "onChange", // Re-validate on change after first submit
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
 
   const { mutate, isPending } = useMutation({
-    mutationFn: async () => {
-      const res = await api.post("/api/auth/admin-login", { email, password });
+    mutationFn: async (data: LoginFormData) => {
+      const res = await api.post("/api/auth/admin-login", {
+        email: data.email,
+        password: data.password,
+      });
       return res.data;
     },
     onSuccess: async (data) => {
       logger.info("Login success", data);
+      setApiError("");
       if (data?.user) qc.setQueryData(["me"], data.user);
       await qc.invalidateQueries({ queryKey: ["me"] });
       await qc.refetchQueries({ queryKey: ["me"] });
@@ -68,31 +78,13 @@ export default function LoginScreen() {
       } else if (err?.response?.data?.message) {
         message = err.response.data.message;
       }
-      setError(message);
+      setApiError(message);
     },
   });
 
-  // 👈 3. Create a handler function for login
-  const handleLogin = () => {
-    // Clear any previous errors
-    setError("");
-
-    // Validate the inputs using Zod
-    const validation = loginSchema.safeParse({ email, password });
-
-    // If validation fails, show the first error and stop
-    if (!validation.success) {
-      const formattedErrors = validation.error.format();
-      if (formattedErrors.email) {
-        setError(formattedErrors.email._errors[0]);
-      } else if (formattedErrors.password) {
-        setError(formattedErrors.password._errors[0]);
-      }
-      return;
-    }
-
-    // If validation succeeds, call mutate
-    mutate();
+  const onSubmit = (data: LoginFormData) => {
+    setApiError("");
+    mutate(data);
   };
 
   // Smooth keyboard animation
@@ -119,95 +111,167 @@ export default function LoginScreen() {
   }, [translateY]);
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
-      <Animated.View
-        className="flex-1 justify-center px-6"
-        style={{
-          transform: [{ translateY }],
-        }}
+    <SafeAreaView className="flex-1 bg-background" edges={["top", "bottom"]}>
+      <Pressable
+        className="flex-1"
+        onPress={Keyboard.dismiss}
+        accessible={false}
       >
-        <View className="mb-8">
-          <Text className="text-3xl font-bold text-text font-sans">
-            Professional
-          </Text>
-          <Text className="mt-1 opacity-70 text-base text-text font-sans">
-            Sign in to access the dashboard
-          </Text>
-        </View>
-
-        {/* Inputs */}
-        <View className="gap-3 pb-10 relative">
-          {/* EMAIL */}
-          <View
-            className="flex-row items-center rounded-xl px-4 border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800"
-            onTouchEnd={() => emailRef.current?.focus()}
-          >
-            <Feather name="mail" size={20} color="#9ca3af" className="mr-2" />
-            <TextInput
-              ref={emailRef}
-              placeholder="Email"
-              autoCapitalize="none"
-              placeholderTextColor="#9ca3af"
-              keyboardType="email-address"
-              value={email}
-              onChangeText={setEmail}
-              returnKeyType="next"
-              onSubmitEditing={() => passwordRef.current?.focus()}
-              className="flex-1  text-[16px] text-text font-sans"
-              style={{
-                paddingVertical: 10,
-                textAlignVertical: "center",
-              }}
-            />
-          </View>
-
-          {/* PASSWORD */}
-          <View
-            className="flex-row items-center rounded-xl px-4 border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800"
-            onTouchEnd={() => passwordRef.current?.focus()}
-          >
-            <Feather name="key" size={20} color="#9ca3af" className="mr-2" />
-            <TextInput
-              ref={passwordRef}
-              placeholder="Password"
-              placeholderTextColor="#9ca3af"
-              secureTextEntry
-              value={password}
-              onChangeText={setPassword}
-              returnKeyType="done"
-              onSubmitEditing={handleLogin} // 👈 Can also trigger login on submit
-              className="flex-1 text-[16px] text-text font-sans"
-              style={{
-                paddingVertical: 12,
-                textAlignVertical: "center",
-              }}
-            />
-          </View>
-
-          {error ? (
-            <Text className="text-red-500 text-sm absolute bottom-4 left-1 font-sans">
-              {error}
-            </Text>
-          ) : null}
-        </View>
-
-        {/* BUTTON */}
-        <TouchableOpacity
-          className={`w-full py-4 rounded-xl items-center shadow-md ${
-            isPending ? "bg-blue-400" : "bg-blue-600"
-          }`}
-          onPress={handleLogin} // 👈 4. Update the onPress handler
-          disabled={isPending}
+        <Animated.View
+          className="flex-1"
+          style={{
+            transform: [{ translateY }],
+          }}
         >
-          {isPending ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text className="text-white font-semibold text-base font-sans">
-              Sign In
-            </Text>
-          )}
-        </TouchableOpacity>
-      </Animated.View>
+          <ScrollView
+            className="flex-1"
+            contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
+            <View className="px-6 py-8">
+              {/* Header */}
+              <View className="mb-8">
+                <Text className="text-3xl font-bold text-text mb-1 tracking-tight">
+                  Welcome back
+                </Text>
+                <Text className="text-sm text-gray-500 dark:text-gray-400">
+                  Sign in to access your account
+                </Text>
+              </View>
+
+              {/* Form */}
+              <View className="gap-3">
+                {/* Email Input */}
+                <View>
+                  <Controller
+                    control={control}
+                    name="email"
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <View
+                        className={`border-2 rounded-xl transition-colors ${
+                          errors.email
+                            ? "border-red-500 dark:border-red-500 bg-red-50/50 dark:bg-red-900/10"
+                            : "border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800"
+                        }`}
+                      >
+                        <View className="flex-row items-center px-4 py-4">
+                          <Ionicons
+                            name="mail-outline"
+                            size={20}
+                            color={errors.email ? "#ef4444" : "#64748b"}
+                          />
+                          <TextInput
+                            autoCapitalize="none"
+                            keyboardType="email-address"
+                            onChangeText={onChange}
+                            onBlur={onBlur}
+                            value={value}
+                            placeholder="Enter your email"
+                            placeholderTextColor="#9ca3af"
+                            returnKeyType="next"
+                            onSubmitEditing={() =>
+                              passwordInputRef.current?.focus()
+                            }
+                            className="flex-1 text-text text-[16px] ml-3"
+                            style={{ textAlignVertical: "center" }}
+                          />
+                        </View>
+                      </View>
+                    )}
+                  />
+                </View>
+
+                {/* Password Input */}
+                <View>
+                  <Controller
+                    control={control}
+                    name="password"
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <View
+                        className={`border-2 rounded-xl transition-colors ${
+                          errors.password
+                            ? "border-red-500 dark:border-red-500 bg-red-50/50 dark:bg-red-900/10"
+                            : "border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800"
+                        }`}
+                      >
+                        <View className="flex-row items-center px-4 py-4">
+                          <Ionicons
+                            name="lock-closed-outline"
+                            size={20}
+                            color={errors.password ? "#ef4444" : "#64748b"}
+                          />
+                          <TextInput
+                            ref={passwordInputRef}
+                            secureTextEntry
+                            onChangeText={onChange}
+                            onBlur={onBlur}
+                            value={value}
+                            placeholder="Enter your password"
+                            placeholderTextColor="#9ca3af"
+                            returnKeyType="done"
+                            onSubmitEditing={handleSubmit(onSubmit)}
+                            className="flex-1 text-text text-[16px] ml-3"
+                            style={{ textAlignVertical: "center" }}
+                          />
+                        </View>
+                      </View>
+                    )}
+                  />
+                </View>
+
+                {/* Error Messages (Zod Validation & API) */}
+                {(errors.email?.message ||
+                  errors.password?.message ||
+                  apiError) && (
+                  <View className="flex-row items-center mt-1">
+                    <Ionicons name="alert-circle" size={16} color="#ef4444" />
+                    <Text className="text-sm text-red-500 ml-1">
+                      {apiError ||
+                        errors.email?.message ||
+                        errors.password?.message}
+                    </Text>
+                  </View>
+                )}
+
+                {/* Submit Button */}
+                <Pressable
+                  onPress={handleSubmit(onSubmit)}
+                  disabled={isPending}
+                  className={`w-full py-5 rounded-2xl items-center flex-row justify-center mt-2 ${
+                    isPending
+                      ? "bg-blue-400 dark:bg-blue-500"
+                      : "bg-blue-600 dark:bg-blue-700"
+                  } active:opacity-80`}
+                  style={{
+                    shadowColor: "#2563eb",
+                    shadowOffset: { width: 0, height: 4 },
+                    shadowOpacity: 0.3,
+                    shadowRadius: 8,
+                    elevation: 5,
+                  }}
+                >
+                  {isPending ? (
+                    <>
+                      <ActivityIndicator size="small" color="white" />
+                      <Text className="text-base font-bold text-white ml-2">
+                        Signing in...
+                      </Text>
+                    </>
+                  ) : (
+                    <>
+                      <Ionicons name="log-in-outline" size={20} color="white" />
+                      <Text className="text-base font-bold text-white ml-2">
+                        Sign In
+                      </Text>
+                    </>
+                  )}
+                </Pressable>
+              </View>
+            </View>
+          </ScrollView>
+        </Animated.View>
+      </Pressable>
     </SafeAreaView>
   );
 }

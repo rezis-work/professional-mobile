@@ -18,6 +18,8 @@ module.exports = {
         icon: 'var(--color-icon)',
         tabIconDefault: 'var(--color-tabIconDefault)',
         tabIconSelected: 'var(--color-tabIconSelected)',
+        'input-background': 'var(--color-input-background)',
+        'input-border': 'var(--color-input-border)',
       },
       fontFamily: {
         sans: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",

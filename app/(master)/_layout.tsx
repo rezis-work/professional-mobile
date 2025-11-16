@@ -3,7 +3,6 @@ import { useAuth } from "@/lib/auth";
 import { Ionicons } from "@expo/vector-icons";
 import { Redirect, Tabs } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { TouchableOpacity } from "react-native"; // 👈 დაემატა იმპორტი
 
 export default function MasterLayout() {
   const { t } = useTranslation();
@@ -16,31 +15,18 @@ export default function MasterLayout() {
 
   return (
     <Tabs
-      screenOptions={({ navigation }) => ({
-        // 👈 გადაკეთდა ფუნქციად
-        headerShown: true,
+      screenOptions={{
+        headerShown: false,
         tabBarActiveTintColor: tint,
         tabBarInactiveTintColor: text,
         tabBarStyle: { backgroundColor: background },
-        headerStyle: { backgroundColor: background },
-        headerTitleStyle: { color: text }, // 👇 დაემატა უკან დაბრუნების ღილაკი
-        headerLeft: () =>
-          navigation.canGoBack() ? ( // 👈 ვამოწმებთ, თუ შესაძლებელია უკან დაბრუნება
-            <TouchableOpacity
-              onPress={() => navigation.goBack()}
-              style={{ marginLeft: 16 }} // 👈 მცირე დაშორება მარცხნიდან
-            >
-              <Ionicons name="chevron-back" size={24} color={tint} />
-            </TouchableOpacity>
-          ) : null, // 👈 თუ არადა, არ ვაჩვენებთ ღილაკს
-      })}
+      }}
     >
       <Tabs.Screen
         name="index"
         options={{
           title: t("masterNavigation.dashboard"),
           tabBarLabel: t("masterNavigation.dashboard"),
-          headerLeft: () => null,
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home" size={size} color={color} />
           ),
