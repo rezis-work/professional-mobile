@@ -1,49 +1,35 @@
-import { View, StyleSheet } from "react-native";
-import { ThemedText } from "@/components/themed-text";
+import { Text, View } from "react-native";
 import { useGetUnreadCount } from "../../hooks/use-get-unread-count";
 
 export function UnreadCount() {
   const { data, isLoading } = useGetUnreadCount();
 
-  if (isLoading || !data) {
+  if (isLoading || !data || data.unreadCount === 0) {
     return null;
   }
 
-  if (data.unreadCount === 0) {
+  // If count is very small, show just a dot
+  if (data.unreadCount <= 0) {
     return null;
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.badge}>
-        <View style={styles.indicator} />
-        <ThemedText style={styles.text}>{data.unreadCount}</ThemedText>
-      </View>
+    <View
+      className="bg-red-500 rounded-full items-center justify-center border-2 border-white dark:border-neutral-900"
+      style={{
+        minWidth: data.unreadCount > 9 ? 24 : 20,
+        height: 20,
+        paddingHorizontal: data.unreadCount > 9 ? 6 : 4,
+        shadowColor: "#ef4444",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.4,
+        shadowRadius: 4,
+        elevation: 5,
+      }}
+    >
+      <Text className="text-white text-[10px] font-extrabold leading-none">
+        {data.unreadCount > 99 ? "99+" : data.unreadCount}
+      </Text>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    alignItems: "center",
-  },
-  badge: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#fee2e2",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-    gap: 6,
-  },
-  indicator: {
-    width: 8,
-    height: 8,
-    backgroundColor: "#ef4444",
-    borderRadius: 4,
-  },
-  text: {
-    fontSize: 14,
-    fontWeight: "700",
-  },
-});

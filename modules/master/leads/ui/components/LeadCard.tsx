@@ -1,6 +1,4 @@
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
-import { Pressable, View, StyleSheet } from "react-native";
+import { Pressable, View, Text } from "react-native";
 import type { Lead } from "../../types";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
@@ -42,133 +40,77 @@ export function LeadCard({ lead }: LeadCardProps) {
   return (
     <Pressable
       onPress={() => router.push(`/(master)/leads/${lead.id}`)}
-      style={styles.card}
+      className="mb-4 bg-white dark:bg-neutral-800 rounded-2xl border border-gray-200 dark:border-neutral-700 overflow-hidden active:opacity-90"
+      style={{
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        elevation: 3,
+      }}
     >
-      <ThemedView style={styles.cardContent}>
-        <View style={styles.header}>
-          <ThemedText type="subtitle" style={styles.clientName}>
+      <View className="p-5">
+        <View className="flex-row justify-between items-center mb-4">
+          <Text className="text-lg font-bold text-text flex-1 mr-3">
             {lead.client.fullName}
-          </ThemedText>
+          </Text>
           <View
-            style={[
-              styles.statusBadge,
-              { backgroundColor: getStatusColor(lead.status) },
-            ]}
+            className="px-3 py-1.5 rounded-xl"
+            style={{ backgroundColor: getStatusColor(lead.status) }}
           >
-            <ThemedText style={styles.statusText}>
+            <Text className="text-white text-xs font-bold">
               {lead.status.toUpperCase()}
-            </ThemedText>
+            </Text>
           </View>
         </View>
 
-        <View style={styles.infoRow}>
-          <ThemedText style={styles.label}>{t("leads.job")}:</ThemedText>
-          <ThemedText style={styles.value}>{lead.jobTitle.en}</ThemedText>
+        <View className="flex-row justify-between mb-3">
+          <Text className="text-sm text-gray-600 dark:text-gray-400 flex-1">
+            {t("leads.job")}:
+          </Text>
+          <Text className="text-sm font-semibold text-text flex-2 text-right">
+            {lead.jobTitle.en}
+          </Text>
         </View>
 
-        <View style={styles.infoRow}>
-          <ThemedText style={styles.label}>{t("leads.location")}:</ThemedText>
-          <ThemedText style={styles.value}>{lead.location}</ThemedText>
+        <View className="flex-row justify-between mb-3">
+          <Text className="text-sm text-gray-600 dark:text-gray-400 flex-1">
+            {t("leads.location")}:
+          </Text>
+          <Text className="text-sm font-semibold text-text flex-2 text-right">
+            {lead.location}
+          </Text>
         </View>
 
-        <View style={styles.infoRow}>
-          <ThemedText style={styles.label}>
+        <View className="flex-row justify-between mb-3">
+          <Text className="text-sm text-gray-600 dark:text-gray-400 flex-1">
             {t("leads.requestedTime")}:
-          </ThemedText>
-          <ThemedText style={styles.value}>
+          </Text>
+          <Text className="text-sm font-semibold text-text flex-2 text-right">
             {formatDate(lead.requestedTime)}
-          </ThemedText>
+          </Text>
         </View>
 
-        <View style={styles.infoRow}>
-          <ThemedText style={styles.label}>{t("leads.price")}:</ThemedText>
-          <ThemedText style={styles.priceValue}>
+        <View className="flex-row justify-between mb-3">
+          <Text className="text-sm text-gray-600 dark:text-gray-400 flex-1">
+            {t("leads.price")}:
+          </Text>
+          <Text className="text-base font-bold text-green-600 dark:text-green-400 flex-2 text-right">
             {lead.price ? `${lead.price} ₾` : t("leads.notSet")}
-          </ThemedText>
+          </Text>
         </View>
 
         {lead.message && (
-          <View style={styles.messageContainer}>
-            <ThemedText style={styles.label}>{t("leads.message")}:</ThemedText>
-            <ThemedText style={styles.messageText} numberOfLines={2}>
+          <View className="mt-3 pt-4 border-t border-gray-200 dark:border-neutral-700">
+            <Text className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+              {t("leads.message")}:
+            </Text>
+            <Text className="text-sm text-text leading-5" numberOfLines={2}>
               {lead.message}
-            </ThemedText>
+            </Text>
           </View>
         )}
-      </ThemedView>
+      </View>
     </Pressable>
   );
 }
-
-const styles = StyleSheet.create({
-  card: {
-    marginBottom: 16,
-    borderRadius: 12,
-    backgroundColor: "white",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  cardContent: {
-    padding: 16,
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 12,
-  },
-  clientName: {
-    fontSize: 18,
-    fontWeight: "600",
-  },
-  statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-  },
-  statusText: {
-    color: "white",
-    fontSize: 10,
-    fontWeight: "600",
-  },
-  infoRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 8,
-    alignItems: "center",
-  },
-  label: {
-    fontSize: 14,
-    opacity: 0.7,
-    flex: 1,
-  },
-  value: {
-    fontSize: 14,
-    flex: 2,
-    textAlign: "right",
-  },
-  priceValue: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#10b981",
-    flex: 2,
-    textAlign: "right",
-  },
-  messageContainer: {
-    marginTop: 8,
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: "#e2e8f0",
-  },
-  messageText: {
-    fontSize: 14,
-    marginTop: 4,
-    opacity: 0.8,
-  },
-});

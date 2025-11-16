@@ -1,8 +1,7 @@
-import { View, StyleSheet, TouchableOpacity } from "react-native";
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
-import type { Notification } from "../../types";
+import { Ionicons } from "@expo/vector-icons";
+import { Pressable, Text, View } from "react-native";
 import { useMarkAsRead } from "../../hooks/use-mark-as-read";
+import type { Notification } from "../../types";
 
 interface NotificationCardProps {
   notification: Notification;
@@ -21,169 +20,107 @@ export function NotificationCard({ notification }: NotificationCardProps) {
   };
 
   return (
-    <ThemedView
-      style={[
-        styles.container,
-        notification.read ? styles.readContainer : styles.unreadContainer,
-      ]}
+    <View
+      className={`p-4 rounded-2xl mb-3 border ${
+        notification.read
+          ? "bg-white dark:bg-neutral-800 border-gray-200 dark:border-neutral-700"
+          : "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800"
+      }`}
+      style={{
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        elevation: 3,
+      }}
     >
-      <View style={styles.header}>
-        <View style={styles.headerLeft}>
+      <View className="flex-row justify-between items-start mb-3">
+        <View className="flex-row items-center flex-1 mr-3">
           <View
-            style={[
-              styles.indicator,
-              notification.read ? styles.readIndicator : styles.unreadIndicator,
-            ]}
+            className={`w-3 h-3 rounded-full mr-2 ${
+              notification.read
+                ? "bg-gray-400 dark:bg-gray-500"
+                : "bg-blue-600 dark:bg-blue-500"
+            }`}
           />
-          <ThemedText style={styles.title} numberOfLines={2}>
+          <Text
+            className="text-base font-bold text-text flex-1"
+            numberOfLines={2}
+          >
             {notification.title || notification.type.replace(/_/g, " ")}
-          </ThemedText>
+          </Text>
         </View>
-        <ThemedText style={styles.date}>
+        <Text className="text-xs text-gray-500 dark:text-gray-400">
           {formatDate(notification.createdAt)}
-        </ThemedText>
+        </Text>
       </View>
 
-      <ThemedText style={styles.message} numberOfLines={3}>
+      <Text className="text-sm text-text leading-5 mb-3" numberOfLines={3}>
         {notification.message}
-      </ThemedText>
+      </Text>
 
       {notification.data && Object.keys(notification.data).length > 0 && (
-        <View style={styles.dataContainer}>
+        <View className="bg-gray-100 dark:bg-neutral-700/50 p-3 rounded-xl mb-3">
           {notification.data.leadId && (
-            <View style={styles.dataRow}>
-              <ThemedText style={styles.dataLabel}>Lead ID:</ThemedText>
-              <ThemedText style={styles.dataValue}>
+            <View className="flex-row justify-between mb-2">
+              <Text className="text-xs text-gray-600 dark:text-gray-400">
+                Lead ID:
+              </Text>
+              <Text className="text-xs font-semibold text-text">
                 {notification.data.leadId}
-              </ThemedText>
+              </Text>
             </View>
           )}
           {notification.data.amount && (
-            <View style={styles.dataRow}>
-              <ThemedText style={styles.dataLabel}>Amount:</ThemedText>
-              <ThemedText style={styles.dataValue}>
+            <View className="flex-row justify-between mb-2">
+              <Text className="text-xs text-gray-600 dark:text-gray-400">
+                Amount:
+              </Text>
+              <Text className="text-xs font-semibold text-text">
                 {notification.data.amount} ₾
-              </ThemedText>
+              </Text>
             </View>
           )}
           {notification.data.clientName && (
-            <View style={styles.dataRow}>
-              <ThemedText style={styles.dataLabel}>Client:</ThemedText>
-              <ThemedText style={styles.dataValue}>
+            <View className="flex-row justify-between">
+              <Text className="text-xs text-gray-600 dark:text-gray-400">
+                Client:
+              </Text>
+              <Text className="text-xs font-semibold text-text">
                 {notification.data.clientName}
-              </ThemedText>
+              </Text>
             </View>
           )}
         </View>
       )}
 
-      <TouchableOpacity
-        style={[
-          styles.button,
-          notification.read ? styles.readButton : styles.unreadButton,
-        ]}
+      <Pressable
         onPress={handleMarkAsRead}
         disabled={isPending || notification.read}
-        activeOpacity={0.7}
+        className={`self-end px-4 py-2 rounded-xl flex-row items-center ${
+          notification.read
+            ? "bg-gray-200 dark:bg-neutral-700"
+            : "bg-blue-600 dark:bg-blue-700"
+        } ${isPending || notification.read ? "opacity-50" : "active:opacity-80"}`}
       >
-        <ThemedText style={styles.buttonText}>
+        {!notification.read && (
+          <Ionicons
+            name="checkmark-circle"
+            size={16}
+            color="white"
+            style={{ marginRight: 6 }}
+          />
+        )}
+        <Text
+          className={`text-xs font-semibold ${
+            notification.read
+              ? "text-gray-600 dark:text-gray-400"
+              : "text-white"
+          }`}
+        >
           {notification.read ? "Marked" : "Mark as Read"}
-        </ThemedText>
-      </TouchableOpacity>
-    </ThemedView>
+        </Text>
+      </Pressable>
+    </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 12,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  readContainer: {
-    backgroundColor: "#f9fafb",
-  },
-  unreadContainer: {
-    backgroundColor: "#eff6ff",
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    marginBottom: 8,
-  },
-  headerLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-    flex: 1,
-    gap: 8,
-  },
-  indicator: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-  },
-  readIndicator: {
-    backgroundColor: "#9ca3af",
-  },
-  unreadIndicator: {
-    backgroundColor: "#3b82f6",
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: "700",
-    flex: 1,
-  },
-  date: {
-    fontSize: 12,
-    opacity: 0.6,
-  },
-  message: {
-    fontSize: 14,
-    marginBottom: 12,
-    lineHeight: 20,
-  },
-  dataContainer: {
-    backgroundColor: "#f3f4f6",
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 12,
-  },
-  dataRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 4,
-  },
-  dataLabel: {
-    fontSize: 12,
-    opacity: 0.7,
-  },
-  dataValue: {
-    fontSize: 12,
-    fontWeight: "600",
-  },
-  button: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    alignSelf: "flex-end",
-  },
-  readButton: {
-    backgroundColor: "#e5e7eb",
-  },
-  unreadButton: {
-    backgroundColor: "#3b82f6",
-  },
-  buttonText: {
-    fontSize: 12,
-    fontWeight: "600",
-  },
-});

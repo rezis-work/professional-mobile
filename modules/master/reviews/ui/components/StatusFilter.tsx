@@ -1,5 +1,4 @@
-import { View, StyleSheet, TouchableOpacity } from "react-native";
-import { ThemedText } from "@/components/themed-text";
+import { Pressable, View, Text } from "react-native";
 import { ReviewStatus } from "../../types";
 import { useTranslation } from "react-i18next";
 
@@ -22,54 +21,28 @@ export function StatusFilter({
   ];
 
   return (
-    <View style={styles.container}>
+    <View className="flex-row flex-wrap gap-2">
       {statuses.map((status) => (
-        <TouchableOpacity
+        <Pressable
           key={status.value}
-          style={[
-            styles.chip,
-            selectedStatus === status.value && styles.chipActive,
-          ]}
           onPress={() => onStatusChange(status.value)}
-          activeOpacity={0.7}
+          className={`px-4 py-2 rounded-full border ${
+            selectedStatus === status.value
+              ? "bg-blue-600 dark:bg-blue-700 border-blue-600 dark:border-blue-700"
+              : "bg-white dark:bg-neutral-800 border-gray-200 dark:border-neutral-700"
+          } active:opacity-70`}
         >
-          <ThemedText
-            style={[
-              styles.chipText,
-              selectedStatus === status.value && styles.chipTextActive,
-            ]}
+          <Text
+            className={`text-sm font-semibold ${
+              selectedStatus === status.value
+                ? "text-white"
+                : "text-gray-600 dark:text-gray-400"
+            }`}
           >
             {status.label}
-          </ThemedText>
-        </TouchableOpacity>
+          </Text>
+        </Pressable>
       ))}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    gap: 8,
-    marginBottom: 16,
-  },
-  chip: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: "#f3f4f6",
-    borderWidth: 1,
-    borderColor: "#e5e7eb",
-  },
-  chipActive: {
-    backgroundColor: "#3b82f6",
-    borderColor: "#3b82f6",
-  },
-  chipText: {
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  chipTextActive: {
-    color: "#fff",
-  },
-});

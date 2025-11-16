@@ -3,6 +3,8 @@ import { useAuth } from "@/lib/auth";
 import { Ionicons } from "@expo/vector-icons";
 import { Redirect, Tabs } from "expo-router";
 import { useTranslation } from "react-i18next";
+import { UnreadCount } from "@/modules/master/notifications/ui/components/UnreadCount";
+import { View } from "react-native";
 
 export default function MasterLayout() {
   const { t } = useTranslation();
@@ -114,7 +116,12 @@ export default function MasterLayout() {
           title: t("masterNavigation.notifications"),
           tabBarLabel: t("masterNavigation.notifications"),
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="notifications" size={size} color={color} />
+            <View style={{ position: "relative", width: size + 8, height: size + 8, alignItems: "center", justifyContent: "center" }}>
+              <Ionicons name="notifications" size={size} color={color} />
+              <View style={{ position: "absolute", top: 0, right: 0 }}>
+                <UnreadCount />
+              </View>
+            </View>
           ),
         }}
       />

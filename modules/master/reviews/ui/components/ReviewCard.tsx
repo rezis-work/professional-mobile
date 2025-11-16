@@ -1,6 +1,4 @@
-import { View, StyleSheet } from "react-native";
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
+import { View, Text } from "react-native";
 import type { Review } from "../../types";
 import { useTranslation } from "react-i18next";
 
@@ -24,227 +22,114 @@ export function ReviewCard({ review }: ReviewCardProps) {
       .toUpperCase();
   };
 
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case "approved":
+        return "bg-green-500";
+      case "rejected":
+        return "bg-red-500";
+      case "pending":
+        return "bg-amber-500";
+      default:
+        return "bg-gray-500";
+    }
+  };
+
   return (
-    <ThemedView style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.avatar}>
-          <ThemedText style={styles.avatarText}>
+    <View className="bg-white dark:bg-neutral-800 rounded-2xl p-4 mb-3 border border-gray-200 dark:border-neutral-700 shadow-sm">
+      <View className="flex-row items-center mb-4 gap-3">
+        <View className="w-10 h-10 rounded-full bg-blue-600 dark:bg-blue-700 items-center justify-center">
+          <Text className="text-white text-sm font-bold">
             {getInitials(review.client.fullName)}
-          </ThemedText>
+          </Text>
         </View>
-        <View style={styles.headerInfo}>
-          <ThemedText style={styles.clientName}>
+        <View className="flex-1">
+          <Text className="text-base font-bold text-gray-900 dark:text-white mb-1">
             {review.client.fullName}
-          </ThemedText>
-          <ThemedText style={styles.date}>
+          </Text>
+          <Text className="text-xs text-gray-500 dark:text-gray-400">
             {formatDate(review.createdAt)}
-          </ThemedText>
+          </Text>
         </View>
-        <View style={[styles.badge, getStatusStyle(review.status)]}>
-          <ThemedText style={styles.badgeText}>{review.status}</ThemedText>
+        <View className={`px-3 py-1.5 rounded-xl ${getStatusColor(review.status)}`}>
+          <Text className="text-white text-xs font-semibold capitalize">
+            {review.status}
+          </Text>
         </View>
       </View>
 
-      <View style={styles.ratingSection}>
-        <View style={styles.mainRating}>
-          <ThemedText style={styles.ratingValue}>
+      <View className="bg-gray-50 dark:bg-neutral-700/50 rounded-xl p-3 mb-4">
+        <View className="flex-row items-baseline mb-2">
+          <Text className="text-2xl font-bold text-amber-500 dark:text-amber-400">
             {review.averageRating.toFixed(1)}
-          </ThemedText>
-          <ThemedText style={styles.ratingMax}>/ 25</ThemedText>
+          </Text>
+          <Text className="text-sm text-gray-500 dark:text-gray-400 ml-1">
+            / 25
+          </Text>
         </View>
         {review.normalizedRating && (
-          <ThemedText style={styles.normalizedText}>
+          <Text className="text-xs text-gray-600 dark:text-gray-400">
             {t("reviews.normalized")}: {review.normalizedRating}
-          </ThemedText>
+          </Text>
         )}
       </View>
 
-      <View style={styles.ratingsGrid}>
-        <View style={styles.ratingItem}>
-          <ThemedText style={styles.ratingLabel}>
+      <View className="mb-4">
+        <View className="flex-row justify-between mb-2">
+          <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300">
             {t("reviews.price")}:
-          </ThemedText>
-          <ThemedText style={styles.ratingValue}>
+          </Text>
+          <Text className="text-sm font-bold text-gray-900 dark:text-white">
             {review.ratingPrice}
-          </ThemedText>
+          </Text>
         </View>
-        <View style={styles.ratingItem}>
-          <ThemedText style={styles.ratingLabel}>
+        <View className="flex-row justify-between mb-2">
+          <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300">
             {t("reviews.quality")}:
-          </ThemedText>
-          <ThemedText style={styles.ratingValue}>
+          </Text>
+          <Text className="text-sm font-bold text-gray-900 dark:text-white">
             {review.ratingQuality}
-          </ThemedText>
+          </Text>
         </View>
-        <View style={styles.ratingItem}>
-          <ThemedText style={styles.ratingLabel}>
+        <View className="flex-row justify-between mb-2">
+          <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300">
             {t("reviews.punctuality")}:
-          </ThemedText>
-          <ThemedText style={styles.ratingValue}>
+          </Text>
+          <Text className="text-sm font-bold text-gray-900 dark:text-white">
             {review.ratingPunctuality}
-          </ThemedText>
+          </Text>
         </View>
-        <View style={styles.ratingItem}>
-          <ThemedText style={styles.ratingLabel}>
+        <View className="flex-row justify-between">
+          <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300">
             {t("reviews.experience")}:
-          </ThemedText>
-          <ThemedText style={styles.ratingValue}>
+          </Text>
+          <Text className="text-sm font-bold text-gray-900 dark:text-white">
             {review.ratingExperience}
-          </ThemedText>
+          </Text>
         </View>
       </View>
 
       {review.comment && (
-        <View style={styles.commentSection}>
-          <ThemedText style={styles.sectionTitle}>
+        <View className="bg-gray-50 dark:bg-neutral-700/50 rounded-xl p-3 mb-3">
+          <Text className="text-sm font-bold text-gray-900 dark:text-white mb-2">
             {t("reviews.comment")}:
-          </ThemedText>
-          <ThemedText style={styles.commentText}>{review.comment}</ThemedText>
+          </Text>
+          <Text className="text-sm text-gray-700 dark:text-gray-300 leading-5">
+            {review.comment}
+          </Text>
         </View>
       )}
 
       {review.masterReply && (
-        <View style={styles.replySection}>
-          <ThemedText style={styles.sectionTitle}>
+        <View className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-3 border-l-4 border-blue-500 dark:border-blue-400">
+          <Text className="text-sm font-bold text-blue-900 dark:text-blue-300 mb-2">
             {t("reviews.yourReply")}:
-          </ThemedText>
-          <ThemedText style={styles.replyText}>{review.masterReply}</ThemedText>
+          </Text>
+          <Text className="text-sm text-blue-800 dark:text-blue-200 leading-5">
+            {review.masterReply}
+          </Text>
         </View>
       )}
-    </ThemedView>
+    </View>
   );
 }
-
-function getStatusStyle(status: string) {
-  switch (status.toLowerCase()) {
-    case "approved":
-      return { backgroundColor: "#10b981" };
-    case "rejected":
-      return { backgroundColor: "#ef4444" };
-    case "pending":
-      return { backgroundColor: "#f59e0b" };
-    default:
-      return { backgroundColor: "#6b7280" };
-  }
-}
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 12,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 12,
-    gap: 12,
-  },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "#000",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  avatarText: {
-    color: "#fff",
-    fontSize: 14,
-    fontWeight: "700",
-  },
-  headerInfo: {
-    flex: 1,
-  },
-  clientName: {
-    fontSize: 16,
-    fontWeight: "700",
-    marginBottom: 2,
-  },
-  date: {
-    fontSize: 12,
-    opacity: 0.6,
-  },
-  badge: {
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  badgeText: {
-    color: "#fff",
-    fontSize: 12,
-    fontWeight: "600",
-    textTransform: "capitalize",
-  },
-  ratingSection: {
-    marginBottom: 16,
-    padding: 12,
-    backgroundColor: "#f3f4f6",
-    borderRadius: 8,
-  },
-  mainRating: {
-    flexDirection: "row",
-    alignItems: "baseline",
-    marginBottom: 4,
-  },
-  ratingValue: {
-    fontSize: 24,
-    fontWeight: "700",
-    color: "#f59e0b",
-  },
-  ratingMax: {
-    fontSize: 14,
-    opacity: 0.6,
-    marginLeft: 4,
-  },
-  normalizedText: {
-    fontSize: 12,
-    opacity: 0.7,
-  },
-  ratingsGrid: {
-    marginBottom: 16,
-  },
-  ratingItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 8,
-  },
-  ratingLabel: {
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  commentSection: {
-    marginBottom: 12,
-    padding: 12,
-    backgroundColor: "#f9fafb",
-    borderRadius: 8,
-  },
-  sectionTitle: {
-    fontSize: 14,
-    fontWeight: "700",
-    marginBottom: 4,
-  },
-  commentText: {
-    fontSize: 14,
-    lineHeight: 20,
-  },
-  replySection: {
-    padding: 12,
-    backgroundColor: "#eff6ff",
-    borderRadius: 8,
-    borderLeftWidth: 4,
-    borderLeftColor: "#3b82f6",
-  },
-  replyText: {
-    fontSize: 14,
-    lineHeight: 20,
-  },
-});

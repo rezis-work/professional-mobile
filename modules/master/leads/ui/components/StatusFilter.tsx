@@ -1,6 +1,4 @@
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
-import { Pressable, View, StyleSheet } from "react-native";
+import { Pressable, View, Text } from "react-native";
 import { LeadStatus } from "../../types";
 import { useTranslation } from "react-i18next";
 
@@ -25,55 +23,28 @@ export function StatusFilter({
   ];
 
   return (
-    <View style={styles.container}>
+    <View className="flex-row flex-wrap gap-2">
       {statuses.map((status) => (
-        <ThemedView
+        <Pressable
           key={status.value}
-          style={[
-            styles.chip,
-            selectedStatus === status.value && styles.chipSelected,
-          ]}
+          onPress={() => onStatusChange(status.value)}
+          className={`px-4 py-2 rounded-full border ${
+            selectedStatus === status.value
+              ? "bg-blue-600 dark:bg-blue-700 border-blue-600 dark:border-blue-700"
+              : "bg-white dark:bg-neutral-800 border-gray-200 dark:border-neutral-700"
+          } active:opacity-70`}
         >
-          <Pressable onPress={() => onStatusChange(status.value)}>
-            <ThemedText
-              style={[
-                styles.chipText,
-                selectedStatus === status.value && styles.chipTextSelected,
-              ]}
-            >
-              {status.label}
-            </ThemedText>
-          </Pressable>
-        </ThemedView>
+          <Text
+            className={`text-sm font-semibold ${
+              selectedStatus === status.value
+                ? "text-white"
+                : "text-gray-600 dark:text-gray-400"
+            }`}
+          >
+            {status.label}
+          </Text>
+        </Pressable>
       ))}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-    marginBottom: 16,
-  },
-  chip: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: "#e2e8f0",
-  },
-  chipSelected: {
-    backgroundColor: "#2563eb",
-    borderColor: "#2563eb",
-  },
-  chipText: {
-    fontSize: 14,
-    color: "#64748b",
-  },
-  chipTextSelected: {
-    color: "white",
-    fontWeight: "600",
-  },
-});
