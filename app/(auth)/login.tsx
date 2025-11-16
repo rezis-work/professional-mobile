@@ -7,29 +7,26 @@ import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
-  ActivityIndicator,
   Animated,
   Keyboard,
   KeyboardEvent,
   Platform,
   Pressable,
-  ScrollView,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { loginSchema, type LoginFormData } from "./schema";
 
 export default function LoginScreen() {
   const router = useRouter();
-  const qc = useQueryClient();
   const [apiError, setApiError] = useState("");
+  const qc = useQueryClient();
   const translateY = useRef(new Animated.Value(0)).current;
   const isAndroid = Platform.OS === "android";
   const showEvent = isAndroid ? "keyboardDidShow" : "keyboardWillShow";
   const hideEvent = isAndroid ? "keyboardDidHide" : "keyboardWillHide";
-
   const passwordInputRef = useRef<TextInput>(null);
 
   const {
@@ -38,8 +35,8 @@ export default function LoginScreen() {
     formState: { errors },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
-    mode: "onSubmit", // Validation on submit
-    reValidateMode: "onChange", // Re-validate on change after first submit
+    mode: "onSubmit",
+    reValidateMode: "onChange",
     defaultValues: {
       email: "",
       password: "",
@@ -57,7 +54,10 @@ export default function LoginScreen() {
     onSuccess: async (data) => {
       logger.info("Login success", data);
       setApiError("");
-      if (data?.user) qc.setQueryData(["me"], data.user);
+      // Optimistically set user to unlock guarded routes immediately
+      if (data?.user) {
+        qc.setQueryData(["me"], data.user);
+      }
       await qc.invalidateQueries({ queryKey: ["me"] });
       await qc.refetchQueries({ queryKey: ["me"] });
       router.replace("/(master)");
@@ -79,199 +79,211 @@ export default function LoginScreen() {
         message = err.response.data.message;
       }
       setApiError(message);
+      logger.error("Login failed", err);
     },
   });
 
-  const onSubmit = (data: LoginFormData) => {
-    setApiError("");
-    mutate(data);
-  };
-
-  // Smooth keyboard animation
+  // Smooth keyboard animation - Animated.View instead of KeyboardAvoidingView
   useEffect(() => {
     const showSub = Keyboard.addListener(showEvent, (e: KeyboardEvent) => {
-      Animated.timing(translateY, {
-        toValue: -e.endCoordinates.height / 3,
-        duration: 250,
-        useNativeDriver: true,
-      }).start();
+      try {
+        const height = e?.endCoordinates?.height || 0;
+        if (height > 0) {
+          Animated.timing(translateY, {
+            toValue: -height / 3,
+            duration: 250,
+            useNativeDriver: true,
+          }).start();
+        }
+      } catch (error) {
+        // Silently fail keyboard animation on Android if it causes issues
+        logger.error("Keyboard animation error", error);
+      }
     });
+
     const hideSub = Keyboard.addListener(hideEvent, () => {
-      Animated.timing(translateY, {
-        toValue: 0,
-        duration: 250,
-        useNativeDriver: true,
-      }).start();
+      try {
+        Animated.timing(translateY, {
+          toValue: 0,
+          duration: 250,
+          useNativeDriver: true,
+        }).start();
+      } catch (error) {
+        // Silently fail keyboard animation on Android if it causes issues
+        logger.error("Keyboard hide animation error", error);
+      }
     });
 
     return () => {
-      showSub.remove();
-      hideSub.remove();
+      try {
+        showSub?.remove();
+        hideSub?.remove();
+      } catch (error) {
+        // Ignore cleanup errors
+      }
     };
-  }, [translateY]);
+  }, [translateY, showEvent, hideEvent]);
+
+  const onSubmit = (data: LoginFormData) => {
+    try {
+      // Dismiss keyboard before submitting on Android
+      if (isAndroid) {
+        Keyboard.dismiss();
+      }
+      setApiError("");
+      mutate(data);
+    } catch (error) {
+      logger.error("Submit error", error);
+      setApiError("Something went wrong. Please try again.");
+    }
+  };
 
   return (
-    <SafeAreaView className="flex-1 bg-background" edges={["top", "bottom"]}>
-      <Pressable
-        className="flex-1"
-        onPress={Keyboard.dismiss}
-        accessible={false}
+    <Pressable
+      className="flex-1 bg-background"
+      onPress={Keyboard.dismiss}
+      accessible={false}
+    >
+      <Animated.View
+        className="flex-1 px-6 py-8 gap-6 justify-center"
+        style={{
+          transform: [{ translateY }],
+        }}
       >
-        <Animated.View
-          className="flex-1"
-          style={{
-            transform: [{ translateY }],
-          }}
-        >
-          <ScrollView
-            className="flex-1"
-            contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}
-            keyboardShouldPersistTaps="handled"
-            showsVerticalScrollIndicator={false}
-          >
-            <View className="px-6 py-8">
-              {/* Header */}
-              <View className="mb-8">
-                <Text className="text-3xl font-bold text-text mb-1 tracking-tight">
-                  Welcome back
-                </Text>
-                <Text className="text-sm text-gray-500 dark:text-gray-400">
-                  Sign in to access your account
-                </Text>
-              </View>
+        {/* Header */}
+        <View className="mb-8">
+          <Text className="text-3xl font-bold text-text mb-1 tracking-tight">
+            Welcome back
+          </Text>
+          <Text className="text-sm text-gray-500 dark:text-gray-400">
+            Sign in to access your account
+          </Text>
+        </View>
 
-              {/* Form */}
-              <View className="gap-3">
-                {/* Email Input */}
-                <View>
-                  <Controller
-                    control={control}
-                    name="email"
-                    render={({ field: { onChange, onBlur, value } }) => (
-                      <View
-                        className={`border-2 rounded-xl transition-colors ${
-                          errors.email
-                            ? "border-red-500 dark:border-red-500 bg-red-50/50 dark:bg-red-900/10"
-                            : "border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800"
-                        }`}
-                      >
-                        <View className="flex-row items-center px-4 py-4">
-                          <Ionicons
-                            name="mail-outline"
-                            size={20}
-                            color={errors.email ? "#ef4444" : "#64748b"}
-                          />
-                          <TextInput
-                            autoCapitalize="none"
-                            keyboardType="email-address"
-                            onChangeText={onChange}
-                            onBlur={onBlur}
-                            value={value}
-                            placeholder="Enter your email"
-                            placeholderTextColor="#9ca3af"
-                            returnKeyType="next"
-                            onSubmitEditing={() =>
-                              passwordInputRef.current?.focus()
-                            }
-                            className="flex-1 text-text text-[16px] ml-3"
-                            style={{ textAlignVertical: "center" }}
-                          />
-                        </View>
-                      </View>
-                    )}
-                  />
-                </View>
-
-                {/* Password Input */}
-                <View>
-                  <Controller
-                    control={control}
-                    name="password"
-                    render={({ field: { onChange, onBlur, value } }) => (
-                      <View
-                        className={`border-2 rounded-xl transition-colors ${
-                          errors.password
-                            ? "border-red-500 dark:border-red-500 bg-red-50/50 dark:bg-red-900/10"
-                            : "border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800"
-                        }`}
-                      >
-                        <View className="flex-row items-center px-4 py-4">
-                          <Ionicons
-                            name="lock-closed-outline"
-                            size={20}
-                            color={errors.password ? "#ef4444" : "#64748b"}
-                          />
-                          <TextInput
-                            ref={passwordInputRef}
-                            secureTextEntry
-                            onChangeText={onChange}
-                            onBlur={onBlur}
-                            value={value}
-                            placeholder="Enter your password"
-                            placeholderTextColor="#9ca3af"
-                            returnKeyType="done"
-                            onSubmitEditing={handleSubmit(onSubmit)}
-                            className="flex-1 text-text text-[16px] ml-3"
-                            style={{ textAlignVertical: "center" }}
-                          />
-                        </View>
-                      </View>
-                    )}
-                  />
-                </View>
-
-                {/* Error Messages (Zod Validation & API) */}
-                {(errors.email?.message ||
-                  errors.password?.message ||
-                  apiError) && (
-                  <View className="flex-row items-center mt-1">
-                    <Ionicons name="alert-circle" size={16} color="#ef4444" />
-                    <Text className="text-sm text-red-500 ml-1">
-                      {apiError ||
-                        errors.email?.message ||
-                        errors.password?.message}
-                    </Text>
-                  </View>
-                )}
-
-                {/* Submit Button */}
-                <Pressable
-                  onPress={handleSubmit(onSubmit)}
-                  disabled={isPending}
-                  className={`w-full py-5 rounded-2xl items-center flex-row justify-center mt-2 ${
-                    isPending
-                      ? "bg-blue-400 dark:bg-blue-500"
-                      : "bg-blue-600 dark:bg-blue-700"
-                  } active:opacity-80`}
-                  style={{
-                    shadowColor: "#2563eb",
-                    shadowOffset: { width: 0, height: 4 },
-                    shadowOpacity: 0.3,
-                    shadowRadius: 8,
-                    elevation: 5,
-                  }}
+        {/* Form */}
+        <View className="gap-3">
+          {/* Email Input */}
+          <View>
+            <Controller
+              control={control}
+              name="email"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <View
+                  className={`border-2 rounded-xl ${
+                    errors.email || apiError
+                      ? "border-red-500 dark:border-red-500 bg-red-50/50 dark:bg-red-900/10"
+                      : "border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800"
+                  }`}
                 >
-                  {isPending ? (
-                    <>
-                      <ActivityIndicator size="small" color="white" />
-                      <Text className="text-base font-bold text-white ml-2">
-                        Signing in...
-                      </Text>
-                    </>
-                  ) : (
-                    <>
-                      <Ionicons name="log-in-outline" size={20} color="white" />
-                      <Text className="text-base font-bold text-white ml-2">
-                        Sign In
-                      </Text>
-                    </>
-                  )}
-                </Pressable>
-              </View>
+                  <View className="flex-row items-center px-4 py-4">
+                    <Ionicons
+                      name="mail-outline"
+                      size={20}
+                      color={errors.email || apiError ? "#ef4444" : "#64748b"}
+                    />
+                    <TextInput
+                      autoCapitalize="none"
+                      keyboardType="email-address"
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      value={value}
+                      placeholder="Enter your email"
+                      placeholderTextColor="#9ca3af"
+                      returnKeyType="next"
+                      onSubmitEditing={() => passwordInputRef.current?.focus()}
+                      className="flex-1 text-text text-[16px] ml-3"
+                      style={{ textAlignVertical: "center" }}
+                    />
+                  </View>
+                </View>
+              )}
+            />
+          </View>
+
+          {/* Password Input */}
+          <View>
+            <Controller
+              control={control}
+              name="password"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <View
+                  className={`border-2 rounded-xl ${
+                    errors.password || apiError
+                      ? "border-red-500 dark:border-red-500 bg-red-50/50 dark:bg-red-900/10"
+                      : "border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800"
+                  }`}
+                >
+                  <View className="flex-row items-center px-4 py-4">
+                    <Ionicons
+                      name="lock-closed-outline"
+                      size={20}
+                      color={
+                        errors.password || apiError ? "#ef4444" : "#64748b"
+                      }
+                    />
+                    <TextInput
+                      ref={passwordInputRef}
+                      secureTextEntry
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      value={value}
+                      placeholder="Enter your password"
+                      placeholderTextColor="#9ca3af"
+                      returnKeyType="done"
+                      onSubmitEditing={handleSubmit(onSubmit)}
+                      className="flex-1 text-text text-[16px] ml-3"
+                      style={{ textAlignVertical: "center" }}
+                    />
+                  </View>
+                </View>
+              )}
+            />
+          </View>
+
+          {/* Error Messages (Zod Validation & API) */}
+          {(errors.email?.message || errors.password?.message || apiError) && (
+            <View className="flex-row items-center mt-1">
+              <Ionicons name="alert-circle" size={16} color="#ef4444" />
+              <Text className="text-sm text-red-500 ml-1">
+                {apiError || errors.email?.message || errors.password?.message}
+              </Text>
             </View>
-          </ScrollView>
-        </Animated.View>
-      </Pressable>
-    </SafeAreaView>
+          )}
+
+          {/* Submit Button */}
+          <TouchableOpacity
+            onPress={handleSubmit(onSubmit)}
+            disabled={isPending}
+            className={`w-full py-5 rounded-2xl items-center flex-row justify-center mt-2 ${
+              isPending
+                ? "bg-blue-400 dark:bg-blue-500"
+                : "bg-blue-600 dark:bg-blue-700"
+            } active:opacity-80`}
+            style={{
+              shadowColor: "#2563eb",
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.3,
+              shadowRadius: 8,
+              elevation: 5,
+            }}
+          >
+            {isPending ? (
+              <>
+                <Text className="text-base font-bold text-white">
+                  Signing in...
+                </Text>
+              </>
+            ) : (
+              <>
+                <Ionicons name="log-in-outline" size={20} color="white" />
+                <Text className="text-base font-bold text-white ml-2">
+                  Sign In
+                </Text>
+              </>
+            )}
+          </TouchableOpacity>
+        </View>
+      </Animated.View>
+    </Pressable>
   );
 }
