@@ -27,10 +27,16 @@ export function JobsGrid({
           <View className="bg-gradient-to-br from-blue-100 to-blue-50 dark:from-blue-900/40 dark:to-blue-800/20 rounded-xl p-3 mb-4 self-start">
             <Ionicons name="briefcase" size={22} color="#2563eb" />
           </View>
-          <Text className="text-lg font-bold text-text mb-2.5" numberOfLines={1}>
+          <Text
+            className="text-lg font-bold text-text mb-2.5"
+            numberOfLines={1}
+          >
             {job.title.en}
           </Text>
-          <Text className="text-sm text-gray-600 dark:text-gray-400 mb-4 leading-5" numberOfLines={2}>
+          <Text
+            className="text-sm text-gray-600 dark:text-gray-400 mb-4 leading-5"
+            numberOfLines={2}
+          >
             {job.description.en}
           </Text>
           <View className="flex-row items-center justify-between pt-3 border-t border-gray-100 dark:border-neutral-700">
