@@ -1,4 +1,9 @@
-import { ScrollView, View } from "react-native";
+import {
+  ScrollView,
+  View,
+  StyleSheet,
+  ActivityIndicator,
+} from "react-native";
 import { ThemedText } from "@/components/themed-text";
 import { useGetUnlockedMasterLocations } from "../../hooks/useGetUnlockedMasterLocations";
 import { useDeleteUnlockedLocation } from "../../hooks/useDeleteUnlockedLocation";
@@ -9,8 +14,28 @@ import {
   UnlockedNoData,
 } from "../components/States";
 import { UnlockedCard } from "../components/UnlockedCard";
+import { useTranslation } from "react-i18next";
+import { useThemeColor } from "@/hooks/use-theme-color";
+import { useColorScheme } from "@/hooks/use-color-scheme";
+import { Ionicons } from "@expo/vector-icons";
 
 export function UnlockedLocationsView() {
+  const { t } = useTranslation();
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
+  const backgroundColor = useThemeColor(
+    { light: "#F3F4F6", dark: "#000000" },
+    "background"
+  );
+  const cardBg = useThemeColor(
+    { light: "#FFFFFF", dark: "#1F2937" },
+    "background"
+  );
+  const tint = useThemeColor(
+    { light: "#3B82F6", dark: "#2563EB" },
+    "tint"
+  );
+
   const { data, isLoading, isError, error } = useGetUnlockedMasterLocations();
   const { mutate: deleteUnlockedLocation, isPending } =
     useDeleteUnlockedLocation();
@@ -22,30 +47,64 @@ export function UnlockedLocationsView() {
   if (unlockedCities.length === 0) return <UnlockedNoData />;
 
   return (
-    <ScrollView contentContainerStyle={{ padding: 16, gap: 16 }}>
-      <View style={{ gap: 8, alignItems: "center" }}>
-        <ThemedText type="title">My Unlocked Cities</ThemedText>
-        <ThemedText>
+    <ScrollView
+      style={{ flex: 1, backgroundColor }}
+      contentContainerStyle={styles.scrollContent}
+      showsVerticalScrollIndicator={false}
+    >
+      {/* Header */}
+      <View style={styles.header}>
+        <ThemedText type="title" style={styles.title} numberOfLines={1}>
+          {t("masterNavigation.unlockedCities")}
+        </ThemedText>
+        <ThemedText style={styles.subtitle} numberOfLines={1}>
           {unlockedCities.length}{" "}
           {unlockedCities.length === 1 ? "city unlocked" : "cities unlocked"}
         </ThemedText>
       </View>
 
-      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 12 }}>
+      {/* Cities Grid */}
+      <View style={styles.grid}>
         {unlockedCities.map((city) => {
           const unlockedDate = new Date(city.unlockedAt).toLocaleDateString();
           return (
-            <View key={city.cityPartId} style={{ width: "48%" }}>
-              <UnlockedCard
-                city={city}
-                isPending={isPending}
-                onRemove={deleteUnlockedLocation}
-                unlockedDate={unlockedDate}
-              />
-            </View>
+            <UnlockedCard
+              key={city.cityPartId}
+              city={city}
+              isPending={isPending}
+              onRemove={deleteUnlockedLocation}
+              unlockedDate={unlockedDate}
+            />
           );
         })}
       </View>
     </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  scrollContent: {
+    padding: 16,
+    gap: 16,
+  },
+  header: {
+    marginBottom: 12,
+    gap: 4,
+    flexShrink: 1,
+  },
+  title: {
+    marginBottom: 0,
+    flexShrink: 1,
+  },
+  subtitle: {
+    fontSize: 14,
+    opacity: 0.7,
+    flexShrink: 1,
+  },
+  grid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 12,
+    alignItems: "flex-start",
+  },
+});

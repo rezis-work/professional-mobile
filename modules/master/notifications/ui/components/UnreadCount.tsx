@@ -1,9 +1,17 @@
 import { View, StyleSheet } from "react-native";
 import { ThemedText } from "@/components/themed-text";
 import { useGetUnreadCount } from "../../hooks/use-get-unread-count";
+import { useThemeColor } from "@/hooks/use-theme-color";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 
 export function UnreadCount() {
   const { data, isLoading } = useGetUnreadCount();
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
+  const badgeBg = useThemeColor(
+    { light: "#FEE2E2", dark: "#7F1D1D" },
+    "background"
+  );
 
   if (isLoading || !data) {
     return null;
@@ -15,9 +23,11 @@ export function UnreadCount() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.badge}>
+      <View style={[styles.badge, { backgroundColor: badgeBg }]}>
         <View style={styles.indicator} />
-        <ThemedText style={styles.text}>{data.unreadCount}</ThemedText>
+        <ThemedText style={styles.text} lightColor="#DC2626" darkColor="#FCA5A5">
+          {data.unreadCount}
+        </ThemedText>
       </View>
     </View>
   );
@@ -30,20 +40,19 @@ const styles = StyleSheet.create({
   badge: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#fee2e2",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 16,
     gap: 6,
   },
   indicator: {
     width: 8,
     height: 8,
-    backgroundColor: "#ef4444",
+    backgroundColor: "#EF4444",
     borderRadius: 4,
   },
   text: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: "700",
   },
 });

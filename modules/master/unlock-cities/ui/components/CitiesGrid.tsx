@@ -1,5 +1,8 @@
 import { ThemedText } from "@/components/themed-text";
-import { Image, Pressable, View } from "react-native";
+import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useThemeColor } from "@/hooks/use-theme-color";
+import { Ionicons } from "@expo/vector-icons";
+import { Image, Platform, StyleSheet, TouchableOpacity, View } from "react-native";
 import type { City } from "../../types";
 
 export function CitiesGrid({
@@ -9,38 +12,134 @@ export function CitiesGrid({
   cities: City[];
   onCityPress: (cityId: string) => void;
 }) {
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
+  const cardBg = useThemeColor(
+    { light: "#FFFFFF", dark: "#1F2937" },
+    "background"
+  );
+  const borderColor = useThemeColor(
+    { light: "#E5E7EB", dark: "#374151" },
+    "text"
+  );
+  const tint = useThemeColor(
+    { light: "#3B82F6", dark: "#2563EB" },
+    "tint"
+  );
+
   return (
-    <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 12 }}>
+    <View style={styles.grid}>
       {cities.map((city) => (
-        <Pressable
+        <TouchableOpacity
           key={city.id}
           onPress={() => onCityPress(city.id)}
-          style={{
-            width: "48%",
-            backgroundColor: "white",
-            borderRadius: 12,
-            overflow: "hidden",
-            borderWidth: 1,
-            borderColor: city.isActive ? "#86efac" : "#e2e8f0",
-          }}
+          style={[
+            styles.card,
+            {
+              backgroundColor: cardBg,
+              borderColor: city.isActive ? "#10B981" : borderColor,
+            },
+            isDark && styles.cardDark,
+          ]}
+          activeOpacity={0.7}
         >
-          <Image
-            source={{ uri: city.imageUrl }}
-            style={{ width: "100%", height: 120 }}
-          />
-          <View style={{ padding: 12 }}>
-            <ThemedText type="subtitle">{city.name}</ThemedText>
-            <ThemedText
-              style={{
-                marginTop: 4,
-                color: city.isActive ? "#16a34a" : "#2563eb",
-              }}
-            >
-              View Areas
-            </ThemedText>
+          <View style={styles.imageContainer}>
+            <Image
+              source={{ uri: city.imageUrl }}
+              style={styles.image}
+              resizeMode="cover"
+            />
+            {city.isActive && (
+              <View style={styles.activeBadge}>
+                <Ionicons name="checkmark-circle" size={14} color="#FFFFFF" />
+              </View>
+            )}
           </View>
-        </Pressable>
+          <View style={styles.content}>
+            <ThemedText type="subtitle" style={styles.cityName} numberOfLines={1} ellipsizeMode="tail">
+              {city.name}
+            </ThemedText>
+            <View style={styles.footer}>
+              <Ionicons
+                name="location"
+                size={12}
+                color={city.isActive ? "#10B981" : tint}
+              />
+              <ThemedText
+                style={[
+                  styles.viewText,
+                  { color: city.isActive ? "#10B981" : tint },
+                ]}
+                numberOfLines={1}
+              >
+                View Areas
+              </ThemedText>
+            </View>
+          </View>
+        </TouchableOpacity>
       ))}
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  grid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 12,
+  },
+  card: {
+    width: "47%",
+    borderRadius: 12,
+    borderWidth: 1.5,
+    overflow: "hidden",
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
+  },
+  cardDark: {
+    borderWidth: 1,
+  },
+  imageContainer: {
+    position: "relative",
+    width: "100%",
+    height: 100,
+  },
+  image: {
+    width: "100%",
+    height: "100%",
+  },
+  activeBadge: {
+    position: "absolute",
+    top: 6,
+    right: 6,
+    backgroundColor: "#10B981",
+    borderRadius: 10,
+    padding: 3,
+  },
+  content: {
+    padding: 10,
+    gap: 6,
+  },
+  cityName: {
+    marginBottom: 0,
+    fontSize: 14,
+  },
+  footer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  viewText: {
+    fontSize: 11,
+    fontWeight: "600",
+  },
+});

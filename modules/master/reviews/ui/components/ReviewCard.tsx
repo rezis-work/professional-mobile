@@ -1,8 +1,10 @@
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Platform } from "react-native";
 import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
 import type { Review } from "../../types";
 import { useTranslation } from "react-i18next";
+import { useThemeColor } from "@/hooks/use-theme-color";
+import { useColorScheme } from "@/hooks/use-color-scheme";
+import { Ionicons } from "@expo/vector-icons";
 
 interface ReviewCardProps {
   review: Review;
@@ -10,6 +12,16 @@ interface ReviewCardProps {
 
 export function ReviewCard({ review }: ReviewCardProps) {
   const { t } = useTranslation();
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
+  const cardBg = useThemeColor(
+    { light: "#FFFFFF", dark: "#1F2937" },
+    "background"
+  );
+  const borderColor = useThemeColor(
+    { light: "#E5E7EB", dark: "#374151" },
+    "text"
+  );
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -25,10 +37,16 @@ export function ReviewCard({ review }: ReviewCardProps) {
   };
 
   return (
-    <ThemedView style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: cardBg, borderColor },
+        isDark && styles.cardDark,
+      ]}
+    >
       <View style={styles.header}>
-        <View style={styles.avatar}>
-          <ThemedText style={styles.avatarText}>
+        <View style={[styles.avatar, { backgroundColor: isDark ? "#374151" : "#111827" }]}>
+          <ThemedText style={styles.avatarText} lightColor="#FFFFFF" darkColor="#FFFFFF">
             {getInitials(review.client.fullName)}
           </ThemedText>
         </View>
@@ -36,17 +54,23 @@ export function ReviewCard({ review }: ReviewCardProps) {
           <ThemedText style={styles.clientName}>
             {review.client.fullName}
           </ThemedText>
-          <ThemedText style={styles.date}>
-            {formatDate(review.createdAt)}
-          </ThemedText>
+          <View style={styles.dateRow}>
+            <Ionicons name="calendar-outline" size={12} color="#6B7280" />
+            <ThemedText style={styles.date}>
+              {formatDate(review.createdAt)}
+            </ThemedText>
+          </View>
         </View>
         <View style={[styles.badge, getStatusStyle(review.status)]}>
-          <ThemedText style={styles.badgeText}>{review.status}</ThemedText>
+          <ThemedText style={styles.badgeText} lightColor="#FFFFFF" darkColor="#FFFFFF">
+            {review.status}
+          </ThemedText>
         </View>
       </View>
 
-      <View style={styles.ratingSection}>
+      <View style={[styles.ratingSection, { backgroundColor: isDark ? "#111827" : "#F3F4F6" }]}>
         <View style={styles.mainRating}>
+          <Ionicons name="star" size={24} color="#F59E0B" />
           <ThemedText style={styles.ratingValue}>
             {review.averageRating.toFixed(1)}
           </ThemedText>
@@ -61,57 +85,75 @@ export function ReviewCard({ review }: ReviewCardProps) {
 
       <View style={styles.ratingsGrid}>
         <View style={styles.ratingItem}>
-          <ThemedText style={styles.ratingLabel}>
-            {t("reviews.price")}:
-          </ThemedText>
-          <ThemedText style={styles.ratingValue}>
+          <View style={styles.ratingLabelContainer}>
+            <Ionicons name="cash" size={14} color="#6B7280" />
+            <ThemedText style={styles.ratingLabel}>
+              {t("reviews.price")}:
+            </ThemedText>
+          </View>
+          <ThemedText style={styles.ratingValueSmall}>
             {review.ratingPrice}
           </ThemedText>
         </View>
         <View style={styles.ratingItem}>
-          <ThemedText style={styles.ratingLabel}>
-            {t("reviews.quality")}:
-          </ThemedText>
-          <ThemedText style={styles.ratingValue}>
+          <View style={styles.ratingLabelContainer}>
+            <Ionicons name="diamond" size={14} color="#6B7280" />
+            <ThemedText style={styles.ratingLabel}>
+              {t("reviews.quality")}:
+            </ThemedText>
+          </View>
+          <ThemedText style={styles.ratingValueSmall}>
             {review.ratingQuality}
           </ThemedText>
         </View>
         <View style={styles.ratingItem}>
-          <ThemedText style={styles.ratingLabel}>
-            {t("reviews.punctuality")}:
-          </ThemedText>
-          <ThemedText style={styles.ratingValue}>
+          <View style={styles.ratingLabelContainer}>
+            <Ionicons name="time" size={14} color="#6B7280" />
+            <ThemedText style={styles.ratingLabel}>
+              {t("reviews.punctuality")}:
+            </ThemedText>
+          </View>
+          <ThemedText style={styles.ratingValueSmall}>
             {review.ratingPunctuality}
           </ThemedText>
         </View>
         <View style={styles.ratingItem}>
-          <ThemedText style={styles.ratingLabel}>
-            {t("reviews.experience")}:
-          </ThemedText>
-          <ThemedText style={styles.ratingValue}>
+          <View style={styles.ratingLabelContainer}>
+            <Ionicons name="happy" size={14} color="#6B7280" />
+            <ThemedText style={styles.ratingLabel}>
+              {t("reviews.experience")}:
+            </ThemedText>
+          </View>
+          <ThemedText style={styles.ratingValueSmall}>
             {review.ratingExperience}
           </ThemedText>
         </View>
       </View>
 
       {review.comment && (
-        <View style={styles.commentSection}>
-          <ThemedText style={styles.sectionTitle}>
-            {t("reviews.comment")}:
-          </ThemedText>
+        <View style={[styles.commentSection, { backgroundColor: isDark ? "#111827" : "#F9FAFB" }]}>
+          <View style={styles.sectionHeader}>
+            <Ionicons name="chatbubble-outline" size={16} color="#6B7280" />
+            <ThemedText style={styles.sectionTitle}>
+              {t("reviews.comment")}:
+            </ThemedText>
+          </View>
           <ThemedText style={styles.commentText}>{review.comment}</ThemedText>
         </View>
       )}
 
       {review.masterReply && (
-        <View style={styles.replySection}>
-          <ThemedText style={styles.sectionTitle}>
-            {t("reviews.yourReply")}:
-          </ThemedText>
+        <View style={[styles.replySection, { backgroundColor: isDark ? "#1E3A8A" : "#EFF6FF", borderLeftColor: "#3B82F6" }]}>
+          <View style={styles.sectionHeader}>
+            <Ionicons name="chatbubble-ellipses" size={16} color="#3B82F6" />
+            <ThemedText style={styles.sectionTitle}>
+              {t("reviews.yourReply")}:
+            </ThemedText>
+          </View>
           <ThemedText style={styles.replyText}>{review.masterReply}</ThemedText>
         </View>
       )}
-    </ThemedView>
+    </View>
   );
 }
 
@@ -132,15 +174,21 @@ const styles = StyleSheet.create({
   container: {
     padding: 16,
     borderRadius: 12,
-    marginBottom: 12,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
+    borderWidth: 1.5,
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
+  },
+  cardDark: {
+    borderWidth: 1,
   },
   header: {
     flexDirection: "row",
@@ -149,61 +197,63 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "#000",
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     justifyContent: "center",
     alignItems: "center",
   },
   avatarText: {
-    color: "#fff",
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: "700",
   },
   headerInfo: {
     flex: 1,
+    gap: 4,
   },
   clientName: {
     fontSize: 16,
-    fontWeight: "700",
-    marginBottom: 2,
+    fontWeight: "600",
+    marginBottom: 0,
+  },
+  dateRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
   },
   date: {
     fontSize: 12,
     opacity: 0.6,
   },
   badge: {
-    paddingHorizontal: 12,
-    paddingVertical: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
     borderRadius: 12,
   },
   badgeText: {
-    color: "#fff",
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: "600",
     textTransform: "capitalize",
   },
   ratingSection: {
     marginBottom: 16,
-    padding: 12,
-    backgroundColor: "#f3f4f6",
-    borderRadius: 8,
+    padding: 14,
+    borderRadius: 10,
+    gap: 6,
   },
   mainRating: {
     flexDirection: "row",
-    alignItems: "baseline",
-    marginBottom: 4,
+    alignItems: "center",
+    gap: 8,
   },
   ratingValue: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: "700",
-    color: "#f59e0b",
+    color: "#F59E0B",
   },
   ratingMax: {
-    fontSize: 14,
+    fontSize: 16,
     opacity: 0.6,
-    marginLeft: 4,
   },
   normalizedText: {
     fontSize: 12,
@@ -211,40 +261,57 @@ const styles = StyleSheet.create({
   },
   ratingsGrid: {
     marginBottom: 16,
+    gap: 10,
   },
   ratingItem: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 8,
+    alignItems: "center",
+  },
+  ratingLabelContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
   },
   ratingLabel: {
     fontSize: 14,
-    fontWeight: "600",
+    fontWeight: "500",
+  },
+  ratingValueSmall: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#F59E0B",
   },
   commentSection: {
     marginBottom: 12,
     padding: 12,
-    backgroundColor: "#f9fafb",
     borderRadius: 8,
+    gap: 8,
+  },
+  sectionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
   },
   sectionTitle: {
     fontSize: 14,
-    fontWeight: "700",
-    marginBottom: 4,
+    fontWeight: "600",
+    marginBottom: 0,
   },
   commentText: {
     fontSize: 14,
     lineHeight: 20,
+    opacity: 0.8,
   },
   replySection: {
     padding: 12,
-    backgroundColor: "#eff6ff",
     borderRadius: 8,
     borderLeftWidth: 4,
-    borderLeftColor: "#3b82f6",
+    gap: 8,
   },
   replyText: {
     fontSize: 14,
     lineHeight: 20,
+    opacity: 0.9,
   },
 });
