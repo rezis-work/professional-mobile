@@ -7,6 +7,7 @@ import { useAuth } from "@/lib/auth";
 import { useMasterDashboard } from "@/modules/master/profile/hooks/useMasterDashboard";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
@@ -24,6 +25,7 @@ export default function MasterDashboardScreen() {
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
+  const [refreshing, setRefreshing] = useState(false);
 
   const { profile, stats, isLoading, refetch, isFetching } =
     useMasterDashboard();
@@ -34,6 +36,15 @@ export default function MasterDashboardScreen() {
     "background"
   );
   const tint = useThemeColor({}, "tint");
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await refetch();
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   const handleLogout = async () => {
     try {
@@ -61,7 +72,12 @@ export default function MasterDashboardScreen() {
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         refreshControl={
-          <RefreshControl refreshing={isFetching} onRefresh={refetch} />
+          <RefreshControl
+            refreshing={refreshing || isFetching}
+            onRefresh={handleRefresh}
+            tintColor={tint}
+            colors={[tint]}
+          />
         }
         showsVerticalScrollIndicator={false}
       >
