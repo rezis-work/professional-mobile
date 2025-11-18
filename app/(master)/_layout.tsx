@@ -1,8 +1,10 @@
-import { Redirect, Tabs } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useAuth } from "@/lib/auth";
+import { useGetUnreadCount } from "@/modules/master/notifications/hooks/use-get-unread-count";
+import { Ionicons } from "@expo/vector-icons";
+import { Redirect, Tabs } from "expo-router";
 import { useTranslation } from "react-i18next";
+import { StyleSheet, Text, View } from "react-native";
 
 export default function MasterLayout() {
   const { t } = useTranslation();
@@ -10,6 +12,9 @@ export default function MasterLayout() {
   const text = useThemeColor({}, "text");
   const background = useThemeColor({}, "background");
   const { user, isLoading } = useAuth();
+  const { data: unreadData } = useGetUnreadCount();
+  const unreadCount = unreadData?.unreadCount || 0;
+
   if (isLoading) return null;
   if (!user) return <Redirect href="/(auth)/login" />;
 
@@ -106,7 +111,16 @@ export default function MasterLayout() {
           title: t("masterNavigation.notifications"),
           tabBarLabel: t("masterNavigation.notifications"),
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="notifications" size={size} color={color} />
+            <View style={styles.iconContainer}>
+              <Ionicons name="notifications" size={size} color={color} />
+              {unreadCount > 0 && (
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>
+                    {unreadCount > 99 ? "99+" : unreadCount.toString()}
+                  </Text>
+                </View>
+              )}
+            </View>
           ),
         }}
       />
@@ -133,3 +147,29 @@ export default function MasterLayout() {
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  iconContainer: {
+    position: "relative",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  badge: {
+    position: "absolute",
+    top: -4,
+    right: -6,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: "#EF4444",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 4,
+  },
+  badgeText: {
+    color: "#FFFFFF",
+    fontSize: 10,
+    fontWeight: "700",
+    lineHeight: 12,
+  },
+});

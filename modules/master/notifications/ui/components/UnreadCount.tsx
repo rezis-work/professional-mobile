@@ -1,17 +1,13 @@
-import { View, StyleSheet } from "react-native";
 import { ThemedText } from "@/components/themed-text";
-import { useGetUnreadCount } from "../../hooks/use-get-unread-count";
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { useColorScheme } from "@/hooks/use-color-scheme";
+import { StyleSheet, View } from "react-native";
+import { useGetUnreadCount } from "../../hooks/use-get-unread-count";
 
 export function UnreadCount() {
   const { data, isLoading } = useGetUnreadCount();
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
-  const badgeBg = useThemeColor(
-    { light: "#FEE2E2", dark: "#7F1D1D" },
-    "background"
-  );
+  const badgeBg = useThemeColor({}, "notificationBadgeBg");
+  const badgeText = useThemeColor({}, "notificationBadgeText");
+  const errorColor = useThemeColor({}, "error");
 
   if (isLoading || !data) {
     return null;
@@ -24,8 +20,12 @@ export function UnreadCount() {
   return (
     <View style={styles.container}>
       <View style={[styles.badge, { backgroundColor: badgeBg }]}>
-        <View style={styles.indicator} />
-        <ThemedText style={styles.text} lightColor="#DC2626" darkColor="#FCA5A5">
+        <View style={[styles.indicator, { backgroundColor: errorColor }]} />
+        <ThemedText
+          style={styles.text}
+          lightColor={badgeText}
+          darkColor={badgeText}
+        >
           {data.unreadCount}
         </ThemedText>
       </View>
@@ -48,7 +48,6 @@ const styles = StyleSheet.create({
   indicator: {
     width: 8,
     height: 8,
-    backgroundColor: "#EF4444",
     borderRadius: 4,
   },
   text: {

@@ -1,7 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
-import { getMasterSelf } from "../services/profile";
-import { getMasterLeadStats } from "../services/profile";
 import { useAuth } from "@/lib/auth";
+import { useQuery } from "@tanstack/react-query";
+import { getMasterLeadStats, getMasterSelf } from "../services/profile";
 
 export function useMasterDashboard() {
   const { user } = useAuth();
@@ -24,9 +23,11 @@ export function useMasterDashboard() {
     stats: statsQuery.data,
     isLoading: profileQuery.isLoading || statsQuery.isLoading,
     isError: profileQuery.isError || statsQuery.isError,
-    refetch: () => {
-      profileQuery.refetch();
-      statsQuery.refetch();
+    refetch: async () => {
+      await Promise.all([
+        profileQuery.refetch(),
+        statsQuery.refetch(),
+      ]);
     },
     isFetching: profileQuery.isFetching || statsQuery.isFetching,
   };

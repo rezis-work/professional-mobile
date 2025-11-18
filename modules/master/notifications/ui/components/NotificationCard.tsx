@@ -3,7 +3,6 @@ import { ThemedText } from "@/components/themed-text";
 import type { Notification } from "../../types";
 import { useMarkAsRead } from "../../hooks/use-mark-as-read";
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { useColorScheme } from "@/hooks/use-color-scheme";
 import { Ionicons } from "@expo/vector-icons";
 
 interface NotificationCardProps {
@@ -12,20 +11,13 @@ interface NotificationCardProps {
 
 export function NotificationCard({ notification }: NotificationCardProps) {
   const { mutate: markAsRead, isPending } = useMarkAsRead();
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
-  const cardBg = useThemeColor(
-    { light: "#FFFFFF", dark: "#1F2937" },
-    "background"
-  );
-  const borderColor = useThemeColor(
-    { light: "#E5E7EB", dark: "#374151" },
-    "text"
-  );
-  const tint = useThemeColor(
-    { light: "#3B82F6", dark: "#2563EB" },
-    "tint"
-  );
+  const cardBg = useThemeColor({}, "cardBackground");
+  const borderColor = useThemeColor({}, "border");
+  const tint = useThemeColor({}, "tint");
+  const unreadBadge = useThemeColor({}, "unreadBadge");
+  const mutedIcon = useThemeColor({}, "mutedIcon");
+  const secondaryBackground = useThemeColor({}, "secondaryBackground");
+  const success = useThemeColor({}, "success");
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -52,7 +44,6 @@ export function NotificationCard({ notification }: NotificationCardProps) {
           borderColor: notification.read ? borderColor : tint,
           borderLeftWidth: notification.read ? 1.5 : 4,
         },
-        isDark && styles.cardDark,
       ]}
     >
       <View style={styles.header}>
@@ -62,15 +53,15 @@ export function NotificationCard({ notification }: NotificationCardProps) {
               styles.iconContainer,
               {
                 backgroundColor: notification.read
-                  ? "rgba(156, 163, 175, 0.1)"
-                  : "rgba(59, 130, 246, 0.1)",
+                  ? `${mutedIcon}1A`
+                  : `${unreadBadge}1A`,
               },
             ]}
           >
             <Ionicons
               name={getNotificationIcon() as any}
               size={20}
-              color={notification.read ? "#9CA3AF" : tint}
+              color={notification.read ? mutedIcon : tint}
             />
           </View>
           <View style={styles.headerText}>
@@ -83,8 +74,8 @@ export function NotificationCard({ notification }: NotificationCardProps) {
           </View>
         </View>
         {!notification.read && (
-          <View style={styles.unreadBadge}>
-            <View style={styles.unreadDot} />
+          <View style={[styles.unreadBadge, { backgroundColor: unreadBadge }]}>
+            <View style={[styles.unreadDot, { backgroundColor: unreadBadge }]} />
           </View>
         )}
       </View>
@@ -94,10 +85,10 @@ export function NotificationCard({ notification }: NotificationCardProps) {
       </ThemedText>
 
       {notification.data && Object.keys(notification.data).length > 0 && (
-        <View style={[styles.dataContainer, { backgroundColor: isDark ? "#111827" : "#F3F4F6" }]}>
+        <View style={[styles.dataContainer, { backgroundColor: secondaryBackground }]}>
           {notification.data.leadId && (
             <View style={styles.dataRow}>
-              <Ionicons name="document-text" size={14} color="#6B7280" />
+              <Ionicons name="document-text" size={14} color={mutedIcon} />
               <ThemedText style={styles.dataLabel}>Lead ID:</ThemedText>
               <ThemedText style={styles.dataValue}>
                 {notification.data.leadId}
@@ -106,16 +97,16 @@ export function NotificationCard({ notification }: NotificationCardProps) {
           )}
           {notification.data.amount && (
             <View style={styles.dataRow}>
-              <Ionicons name="cash" size={14} color="#10B981" />
+              <Ionicons name="cash" size={14} color={success} />
               <ThemedText style={styles.dataLabel}>Amount:</ThemedText>
-              <ThemedText style={[styles.dataValue, { color: "#10B981" }]}>
+              <ThemedText style={[styles.dataValue, { color: success }]}>
                 {notification.data.amount} ₾
               </ThemedText>
             </View>
           )}
           {notification.data.clientName && (
             <View style={styles.dataRow}>
-              <Ionicons name="person" size={14} color="#6B7280" />
+              <Ionicons name="person" size={14} color={mutedIcon} />
               <ThemedText style={styles.dataLabel}>Client:</ThemedText>
               <ThemedText style={styles.dataValue}>
                 {notification.data.clientName}
@@ -129,7 +120,7 @@ export function NotificationCard({ notification }: NotificationCardProps) {
         style={[
           styles.button,
           {
-            backgroundColor: notification.read ? (isDark ? "#374151" : "#E5E7EB") : tint,
+            backgroundColor: notification.read ? borderColor : tint,
           },
           (isPending || notification.read) && styles.buttonDisabled,
         ]}
@@ -144,17 +135,17 @@ export function NotificationCard({ notification }: NotificationCardProps) {
             <Ionicons
               name={notification.read ? "checkmark-circle" : "checkmark-circle-outline"}
               size={16}
-              color={notification.read ? (isDark ? "#9CA3AF" : "#6B7280") : "#FFFFFF"}
+              color={notification.read ? mutedIcon : "#FFFFFF"}
             />
             <ThemedText
               style={[
                 styles.buttonText,
                 notification.read
-                  ? { color: isDark ? "#9CA3AF" : "#6B7280" }
+                  ? { color: mutedIcon }
                   : { color: "#FFFFFF" },
               ]}
-              lightColor={notification.read ? "#6B7280" : "#FFFFFF"}
-              darkColor={notification.read ? "#9CA3AF" : "#FFFFFF"}
+              lightColor={notification.read ? mutedIcon : "#FFFFFF"}
+              darkColor={notification.read ? mutedIcon : "#FFFFFF"}
             >
               {notification.read ? "Marked" : "Mark as Read"}
             </ThemedText>
@@ -181,9 +172,6 @@ const styles = StyleSheet.create({
         elevation: 3,
       },
     }),
-  },
-  cardDark: {
-    borderWidth: 1,
   },
   header: {
     flexDirection: "row",
@@ -221,13 +209,11 @@ const styles = StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: "#3B82F6",
   },
   unreadDot: {
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: "#3B82F6",
   },
   message: {
     fontSize: 14,

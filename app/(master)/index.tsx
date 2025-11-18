@@ -25,20 +25,14 @@ export default function MasterDashboardScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
 
-  const {
-    profile,
-    stats,
-    isLoading,
-    refetch,
-    isFetching,
-  } = useMasterDashboard();
+  const { profile, stats, isLoading, refetch, isFetching } =
+    useMasterDashboard();
 
   const backgroundColor = useThemeColor({}, "background");
   const cardBg = useThemeColor(
     { light: "#FFFFFF", dark: "#1F2937" },
     "background"
   );
-  const textColor = useThemeColor({}, "text");
   const tint = useThemeColor({}, "tint");
 
   const handleLogout = async () => {
@@ -93,7 +87,12 @@ export default function MasterDashboardScreen() {
                 isDark && styles.statCardDark,
               ]}
             >
-              <View style={[styles.statIconContainer, { backgroundColor: "#3B82F6" }]}>
+              <View
+                style={[
+                  styles.statIconContainer,
+                  { backgroundColor: "#3B82F6" },
+                ]}
+              >
                 <Ionicons name="checkmark-circle" size={24} color="#FFFFFF" />
               </View>
               <ThemedText style={styles.statValue}>
@@ -111,7 +110,12 @@ export default function MasterDashboardScreen() {
                 isDark && styles.statCardDark,
               ]}
             >
-              <View style={[styles.statIconContainer, { backgroundColor: "#F59E0B" }]}>
+              <View
+                style={[
+                  styles.statIconContainer,
+                  { backgroundColor: "#F59E0B" },
+                ]}
+              >
                 <Ionicons name="star" size={24} color="#FFFFFF" />
               </View>
               <ThemedText style={styles.statValue}>
@@ -129,7 +133,12 @@ export default function MasterDashboardScreen() {
                 isDark && styles.statCardDark,
               ]}
             >
-              <View style={[styles.statIconContainer, { backgroundColor: "#10B981" }]}>
+              <View
+                style={[
+                  styles.statIconContainer,
+                  { backgroundColor: "#10B981" },
+                ]}
+              >
                 <Ionicons name="trophy" size={24} color="#FFFFFF" />
               </View>
               <ThemedText style={styles.statValue}>
@@ -147,7 +156,12 @@ export default function MasterDashboardScreen() {
                 isDark && styles.statCardDark,
               ]}
             >
-              <View style={[styles.statIconContainer, { backgroundColor: "#8B5CF6" }]}>
+              <View
+                style={[
+                  styles.statIconContainer,
+                  { backgroundColor: "#8B5CF6" },
+                ]}
+              >
                 <Ionicons name="cash" size={24} color="#FFFFFF" />
               </View>
               <ThemedText style={styles.statValue}>
@@ -190,7 +204,9 @@ export default function MasterDashboardScreen() {
                 </ThemedText>
               </View>
               <View style={styles.leadStatItem}>
-                <ThemedText style={[styles.leadStatValue, { color: "#10B981" }]}>
+                <ThemedText
+                  style={[styles.leadStatValue, { color: "#10B981" }]}
+                >
                   {stats.acceptedLeads ?? 0}
                 </ThemedText>
                 <ThemedText style={styles.leadStatLabel}>
@@ -198,7 +214,9 @@ export default function MasterDashboardScreen() {
                 </ThemedText>
               </View>
               <View style={styles.leadStatItem}>
-                <ThemedText style={[styles.leadStatValue, { color: "#EF4444" }]}>
+                <ThemedText
+                  style={[styles.leadStatValue, { color: "#EF4444" }]}
+                >
                   {stats.declinedLeads ?? 0}
                 </ThemedText>
                 <ThemedText style={styles.leadStatLabel}>

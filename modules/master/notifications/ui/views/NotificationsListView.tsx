@@ -5,19 +5,16 @@ import { NotificationCard } from "../components/NotificationCard";
 import { Pagination } from "@/components/Pagination";
 import { useGetNotifications } from "../../hooks/use-get-notifications";
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { useColorScheme } from "@/hooks/use-color-scheme";
 import { Ionicons } from "@expo/vector-icons";
 
 export function NotificationsListView() {
   const [page, setPage] = useState(1);
   const limit = 10;
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
-  const backgroundColor = useThemeColor(
-    { light: "#F3F4F6", dark: "#000000" },
-    "background"
-  );
+  const backgroundColor = useThemeColor({}, "secondaryBackground");
   const textColor = useThemeColor({}, "text");
+  const tint = useThemeColor({}, "tint");
+  const errorColor = useThemeColor({}, "error");
+  const mutedIcon = useThemeColor({}, "mutedIcon");
 
   const { data, isLoading, error, refetch, isRefetching } = useGetNotifications(
     page,
@@ -27,7 +24,7 @@ export function NotificationsListView() {
   if (isLoading) {
     return (
       <View style={[styles.centerContainer, { backgroundColor }]}>
-        <ActivityIndicator size="large" color={isDark ? "#3B82F6" : "#2563EB"} />
+        <ActivityIndicator size="large" color={tint} />
         <ThemedText style={styles.loadingText}>Loading notifications...</ThemedText>
       </View>
     );
@@ -36,7 +33,7 @@ export function NotificationsListView() {
   if (error) {
     return (
       <View style={[styles.centerContainer, { backgroundColor }]}>
-        <Ionicons name="alert-circle" size={48} color="#EF4444" />
+        <Ionicons name="alert-circle" size={48} color={errorColor} />
         <ThemedText style={styles.errorTitle}>Error loading notifications</ThemedText>
         <ThemedText style={styles.errorMessage}>
           {error instanceof Error ? error.message : "Unknown error"}
@@ -48,7 +45,7 @@ export function NotificationsListView() {
   if (!data || !data.notifications.length) {
     return (
       <View style={[styles.centerContainer, { backgroundColor }]}>
-        <Ionicons name="notifications-off" size={48} color={isDark ? "#6B7280" : "#9CA3AF"} />
+        <Ionicons name="notifications-off" size={48} color={mutedIcon} />
         <ThemedText style={styles.emptyText}>No notifications found</ThemedText>
       </View>
     );
