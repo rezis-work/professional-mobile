@@ -31,11 +31,14 @@ export default function MasterDashboardScreen() {
     useMasterDashboard();
 
   const backgroundColor = useThemeColor({}, "background");
-  const cardBg = useThemeColor(
-    { light: "#FFFFFF", dark: "#1F2937" },
-    "background"
-  );
+  const cardBg = useThemeColor({}, "cardBackground");
   const tint = useThemeColor({}, "tint");
+  const statBlue = useThemeColor({}, "statBlue");
+  const statAmber = useThemeColor({}, "statAmber");
+  const statGreen = useThemeColor({}, "statGreen");
+  const statPurple = useThemeColor({}, "statPurple");
+  const error = useThemeColor({}, "error");
+  const white = useThemeColor({}, "white");
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -106,10 +109,10 @@ export default function MasterDashboardScreen() {
               <View
                 style={[
                   styles.statIconContainer,
-                  { backgroundColor: "#3B82F6" },
+                  { backgroundColor: statBlue },
                 ]}
               >
-                <Ionicons name="checkmark-circle" size={24} color="#FFFFFF" />
+                <Ionicons name="checkmark-circle" size={24} color={white} />
               </View>
               <ThemedText style={styles.statValue}>
                 {profile.stats.completedJobs ?? 0}
@@ -129,10 +132,10 @@ export default function MasterDashboardScreen() {
               <View
                 style={[
                   styles.statIconContainer,
-                  { backgroundColor: "#F59E0B" },
+                  { backgroundColor: statAmber },
                 ]}
               >
-                <Ionicons name="star" size={24} color="#FFFFFF" />
+                <Ionicons name="star" size={24} color={white} />
               </View>
               <ThemedText style={styles.statValue}>
                 {(profile.stats.averageRating ?? 0).toFixed(1)}
@@ -152,10 +155,10 @@ export default function MasterDashboardScreen() {
               <View
                 style={[
                   styles.statIconContainer,
-                  { backgroundColor: "#10B981" },
+                  { backgroundColor: statGreen },
                 ]}
               >
-                <Ionicons name="trophy" size={24} color="#FFFFFF" />
+                <Ionicons name="trophy" size={24} color={white} />
               </View>
               <ThemedText style={styles.statValue}>
                 {profile.stats.points ?? 0}
@@ -175,10 +178,10 @@ export default function MasterDashboardScreen() {
               <View
                 style={[
                   styles.statIconContainer,
-                  { backgroundColor: "#8B5CF6" },
+                  { backgroundColor: statPurple },
                 ]}
               >
-                <Ionicons name="cash" size={24} color="#FFFFFF" />
+                <Ionicons name="cash" size={24} color={white} />
               </View>
               <ThemedText style={styles.statValue}>
                 {(profile.stats.totalEarnings ?? 0).toFixed(0)}
@@ -221,7 +224,7 @@ export default function MasterDashboardScreen() {
               </View>
               <View style={styles.leadStatItem}>
                 <ThemedText
-                  style={[styles.leadStatValue, { color: "#10B981" }]}
+                  style={[styles.leadStatValue, { color: statGreen }]}
                 >
                   {stats.acceptedLeads ?? 0}
                 </ThemedText>
@@ -230,9 +233,7 @@ export default function MasterDashboardScreen() {
                 </ThemedText>
               </View>
               <View style={styles.leadStatItem}>
-                <ThemedText
-                  style={[styles.leadStatValue, { color: "#EF4444" }]}
-                >
+                <ThemedText style={[styles.leadStatValue, { color: error }]}>
                   {stats.declinedLeads ?? 0}
                 </ThemedText>
                 <ThemedText style={styles.leadStatLabel}>
@@ -288,10 +289,10 @@ export default function MasterDashboardScreen() {
 
         {/* Logout Button */}
         <TouchableOpacity
-          style={[styles.logoutButton, { backgroundColor: "#EF4444" }]}
+          style={[styles.logoutButton, { backgroundColor: error }]}
           onPress={handleLogout}
         >
-          <Ionicons name="log-out-outline" size={20} color="#FFFFFF" />
+          <Ionicons name="log-out-outline" size={20} color={white} />
           <ThemedText style={styles.logoutText}>
             {t("common.logout")}
           </ThemedText>
@@ -433,7 +434,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   logoutText: {
-    color: "#FFFFFF",
     fontSize: 16,
     fontWeight: "600",
   },

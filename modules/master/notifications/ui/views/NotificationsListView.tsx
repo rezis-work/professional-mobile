@@ -1,20 +1,27 @@
-import { useState } from "react";
-import { ScrollView, View, StyleSheet, RefreshControl, ActivityIndicator } from "react-native";
-import { ThemedText } from "@/components/themed-text";
-import { NotificationCard } from "../components/NotificationCard";
 import { Pagination } from "@/components/Pagination";
-import { useGetNotifications } from "../../hooks/use-get-notifications";
+import { ThemedText } from "@/components/themed-text";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import useThemeColorPalette from "@/hooks/use-theme-color-palette";
 import { Ionicons } from "@expo/vector-icons";
+import { useState } from "react";
+import {
+  ActivityIndicator,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  View,
+} from "react-native";
+import { useGetNotifications } from "../../hooks/use-get-notifications";
+import { NotificationCard } from "../components/NotificationCard";
 
 export function NotificationsListView() {
   const [page, setPage] = useState(1);
   const limit = 10;
-  const backgroundColor = useThemeColor({}, "secondaryBackground");
-  const textColor = useThemeColor({}, "text");
+
   const tint = useThemeColor({}, "tint");
   const errorColor = useThemeColor({}, "error");
   const mutedIcon = useThemeColor({}, "mutedIcon");
+  const colors = useThemeColorPalette();
 
   const { data, isLoading, error, refetch, isRefetching } = useGetNotifications(
     page,
@@ -23,18 +30,26 @@ export function NotificationsListView() {
 
   if (isLoading) {
     return (
-      <View style={[styles.centerContainer, { backgroundColor }]}>
+      <View
+        style={[styles.centerContainer, { backgroundColor: colors.background }]}
+      >
         <ActivityIndicator size="large" color={tint} />
-        <ThemedText style={styles.loadingText}>Loading notifications...</ThemedText>
+        <ThemedText style={styles.loadingText}>
+          Loading notifications...
+        </ThemedText>
       </View>
     );
   }
 
   if (error) {
     return (
-      <View style={[styles.centerContainer, { backgroundColor }]}>
+      <View
+        style={[styles.centerContainer, { backgroundColor: colors.background }]}
+      >
         <Ionicons name="alert-circle" size={48} color={errorColor} />
-        <ThemedText style={styles.errorTitle}>Error loading notifications</ThemedText>
+        <ThemedText style={styles.errorTitle}>
+          Error loading notifications
+        </ThemedText>
         <ThemedText style={styles.errorMessage}>
           {error instanceof Error ? error.message : "Unknown error"}
         </ThemedText>
@@ -44,7 +59,9 @@ export function NotificationsListView() {
 
   if (!data || !data.notifications.length) {
     return (
-      <View style={[styles.centerContainer, { backgroundColor }]}>
+      <View
+        style={[styles.centerContainer, { backgroundColor: colors.background }]}
+      >
         <Ionicons name="notifications-off" size={48} color={mutedIcon} />
         <ThemedText style={styles.emptyText}>No notifications found</ThemedText>
       </View>
@@ -52,7 +69,7 @@ export function NotificationsListView() {
   }
 
   return (
-    <View style={[styles.container, { backgroundColor }]}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}

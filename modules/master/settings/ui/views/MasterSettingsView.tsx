@@ -3,7 +3,6 @@ import { ThemedText } from "@/components/themed-text";
 import {
   TouchableOpacity,
   View,
-  Alert,
   ScrollView,
   StyleSheet,
   Platform,
@@ -28,8 +27,9 @@ import { ImagePickerInput } from "../components/ImagePickerInput";
 import { AvailabilityButtons } from "../components/AvailabilityButtons";
 import { useTranslation } from "react-i18next";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { useThemeColor } from "@/hooks/use-theme-color";
+import { useThemeColorPalette } from "@/hooks/use-theme-color-palette";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useToast } from "@/components/toast";
 import { Ionicons } from "@expo/vector-icons";
 
 export function MasterSettingsView() {
@@ -67,38 +67,27 @@ export function MasterSettingsView() {
   const onSubmit = (data: ProfileFormValues) => {
     upsert(data, {
       onSuccess: () => {
-        Alert.alert(t("common.success"), t("common.profileUpdated"));
+        showToast(t("common.profileUpdated"), "success");
         setValue("bio", "");
         setValue("city", "");
         setValue("image", null);
       },
       onError: (e: any) =>
-        Alert.alert(
-          t("common.error"),
-          e?.response?.data?.message || t("common.updateFailed")
+        showToast(
+          e?.response?.data?.message || t("common.updateFailed"),
+          "error"
         ),
     });
   };
 
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
-  const cardBg = useThemeColor(
-    { light: "#FFFFFF", dark: "#1F2937" },
-    "background"
-  );
-  const backgroundColor = useThemeColor({}, "background");
-  const tint = useThemeColor(
-    { light: "#3B82F6", dark: "#2563EB" },
-    "tint"
-  );
-  const borderColor = useThemeColor(
-    { light: "#E5E7EB", dark: "#374151" },
-    "text"
-  );
+  const colors = useThemeColorPalette();
+  const { showToast } = useToast();
 
   return (
     <ScrollView
-      style={{ flex: 1, backgroundColor }}
+      style={{ flex: 1, backgroundColor: colors.background }}
       contentContainerStyle={styles.scrollContent}
       keyboardShouldPersistTaps="handled"
       showsVerticalScrollIndicator={false}
@@ -107,12 +96,12 @@ export function MasterSettingsView() {
       <View
         style={[
           styles.card,
-          { backgroundColor: cardBg },
-          isDark && styles.cardDark,
+          { backgroundColor: colors.cardBackground },
+          isDark && [styles.cardDark, { borderColor: colors.border }],
         ]}
       >
         <View style={styles.sectionHeader}>
-          <Ionicons name="person" size={20} color={tint} />
+          <Ionicons name="person" size={20} color={colors.primary} />
           <ThemedText type="subtitle" style={styles.sectionTitle}>
             {t("masterNavigation.profileSettings")}
           </ThemedText>
@@ -138,17 +127,17 @@ export function MasterSettingsView() {
           disabled={upserting || isSubmitting}
           style={[
             styles.saveButton,
-            { backgroundColor: tint },
+            { backgroundColor: colors.primary },
             (upserting || isSubmitting) && styles.saveButtonDisabled,
           ]}
           activeOpacity={0.7}
         >
           {upserting || isSubmitting ? (
-            <ActivityIndicator color="#FFFFFF" />
+            <ActivityIndicator color={colors.white} />
           ) : (
             <>
-              <Ionicons name="checkmark-circle" size={20} color="#FFFFFF" />
-              <ThemedText style={styles.saveButtonText} lightColor="#FFFFFF" darkColor="#FFFFFF">
+              <Ionicons name="checkmark-circle" size={20} color={colors.white} />
+              <ThemedText style={styles.saveButtonText} lightColor={colors.white} darkColor={colors.white}>
                 {t("common.saveProfile")}
               </ThemedText>
             </>
@@ -160,12 +149,12 @@ export function MasterSettingsView() {
       <View
         style={[
           styles.card,
-          { backgroundColor: cardBg },
-          isDark && styles.cardDark,
+          { backgroundColor: colors.cardBackground },
+          isDark && [styles.cardDark, { borderColor: colors.border }],
         ]}
       >
         <View style={styles.sectionHeader}>
-          <Ionicons name="time" size={20} color={tint} />
+          <Ionicons name="time" size={20} color={colors.primary} />
           <ThemedText type="subtitle" style={styles.sectionTitle}>
             {t("settings.availability")}
           </ThemedText>
@@ -179,7 +168,7 @@ export function MasterSettingsView() {
         />
         {updatingAvail && (
           <View style={styles.loadingIndicator}>
-            <ActivityIndicator size="small" color={tint} />
+            <ActivityIndicator size="small" color={colors.primary} />
           </View>
         )}
       </View>
@@ -188,12 +177,12 @@ export function MasterSettingsView() {
       <View
         style={[
           styles.card,
-          { backgroundColor: cardBg },
-          isDark && styles.cardDark,
+          { backgroundColor: colors.cardBackground },
+          isDark && [styles.cardDark, { borderColor: colors.border }],
         ]}
       >
         <View style={styles.sectionHeader}>
-          <Ionicons name="language" size={20} color={tint} />
+          <Ionicons name="language" size={20} color={colors.primary} />
           <ThemedText type="subtitle" style={styles.sectionTitle}>
             {t("common.language")}
           </ThemedText>
@@ -227,7 +216,6 @@ const styles = StyleSheet.create({
   },
   cardDark: {
     borderWidth: 1,
-    borderColor: "#374151",
   },
   sectionHeader: {
     flexDirection: "row",
@@ -262,7 +250,6 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   saveButtonText: {
-    color: "#FFFFFF",
     fontSize: 16,
     fontWeight: "600",
   },

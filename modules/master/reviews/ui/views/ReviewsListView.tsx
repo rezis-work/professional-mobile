@@ -7,7 +7,7 @@ import { Pagination } from "@/components/Pagination";
 import { useGetMasterReviews } from "../../hooks/use-get-master-reviews";
 import { ReviewStatus } from "../../types";
 import { useTranslation } from "react-i18next";
-import { useThemeColor } from "@/hooks/use-theme-color";
+import { useThemeColorPalette } from "@/hooks/use-theme-color-palette";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -18,10 +18,7 @@ export function ReviewsListView() {
   const limit = 10;
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
-  const backgroundColor = useThemeColor(
-    { light: "#F3F4F6", dark: "#000000" },
-    "background"
-  );
+  const colors = useThemeColorPalette();
 
   const handleStatusChange = (newStatus: string) => {
     setStatus(newStatus);
@@ -37,28 +34,28 @@ export function ReviewsListView() {
   );
 
   return (
-    <View style={[styles.container, { backgroundColor }]}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <StatusFilter
         selectedStatus={status}
         onStatusChange={handleStatusChange}
       />
 
       {isLoading ? (
-        <View style={[styles.centerContainer, { backgroundColor }]}>
-          <ActivityIndicator size="large" color={isDark ? "#3B82F6" : "#2563EB"} />
+        <View style={[styles.centerContainer, { backgroundColor: colors.background }]}>
+          <ActivityIndicator size="large" color={colors.primary} />
           <ThemedText style={styles.loadingText}>{t("reviews.loadingReviews")}</ThemedText>
         </View>
       ) : error ? (
-        <View style={[styles.centerContainer, { backgroundColor }]}>
-          <Ionicons name="alert-circle" size={48} color="#EF4444" />
+        <View style={[styles.centerContainer, { backgroundColor: colors.background }]}>
+          <Ionicons name="alert-circle" size={48} color={colors.error} />
           <ThemedText style={styles.errorTitle}>{t("reviews.errorLoadingReviews")}</ThemedText>
           <ThemedText style={styles.errorMessage}>
             {error instanceof Error ? error.message : "Unknown error"}
           </ThemedText>
         </View>
       ) : !data || !data.data.reviews.length ? (
-        <View style={[styles.centerContainer, { backgroundColor }]}>
-          <Ionicons name="star-outline" size={48} color={isDark ? "#6B7280" : "#9CA3AF"} />
+        <View style={[styles.centerContainer, { backgroundColor: colors.background }]}>
+          <Ionicons name="star-outline" size={48} color={colors.mutedIcon} />
           <ThemedText style={styles.emptyText}>{t("reviews.noReviewsFound")}</ThemedText>
         </View>
       ) : (

@@ -1,23 +1,11 @@
-import { View, StyleSheet } from "react-native";
-import { ThemedText } from "@/components/themed-text";
 import { ReviewsListView } from "@/modules/master/reviews/ui/views/ReviewsListView";
-import { useThemeColor } from "@/hooks/use-theme-color";
+import { StyleSheet } from "react-native";
 
 export default function ReviewsScreen() {
-  const backgroundColor = useThemeColor(
-    { light: "#F3F4F6", dark: "#000000" },
-    "background"
-  );
-
   return (
-    <View style={[styles.container, { backgroundColor }]}>
-      <View style={styles.header}>
-        <ThemedText type="title" style={styles.title}>
-          Reviews
-        </ThemedText>
-      </View>
+    <>
       <ReviewsListView />
-    </View>
+    </>
   );
 }
 

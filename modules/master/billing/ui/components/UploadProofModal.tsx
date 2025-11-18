@@ -5,7 +5,6 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  Alert,
   ActivityIndicator,
   Image,
 } from "react-native";
@@ -13,6 +12,7 @@ import { ThemedText } from "@/components/themed-text";
 import { useUploadProof } from "../../hooks/use-upload-proof";
 import * as ImagePicker from "expo-image-picker";
 import { useTranslation } from "react-i18next";
+import { useToast } from "@/components/toast";
 
 interface UploadProofModalProps {
   visible: boolean;
@@ -26,6 +26,7 @@ export function UploadProofModal({
   billingId,
 }: UploadProofModalProps) {
   const { t } = useTranslation();
+  const { showToast } = useToast();
   const [proofNote, setProofNote] = useState("");
   const [selectedImage, setSelectedImage] = useState<{
     uri: string;
@@ -42,10 +43,7 @@ export function UploadProofModal({
       console.log("Permission status:", status);
 
       if (status !== "granted") {
-        Alert.alert(
-          t("settings.permissionRequired"),
-          t("settings.permissionRequired")
-        );
+        showToast(t("settings.permissionRequired"), "warning");
         return;
       }
 
@@ -66,23 +64,23 @@ export function UploadProofModal({
       }
     } catch (error) {
       console.error("Error in handlePickImage:", error);
-      Alert.alert(t("common.error"), t("billing.failedToPickImage"));
+      showToast(t("billing.failedToPickImage"), "error");
     }
   };
 
   const handleUpload = async () => {
     if (!proofNote.trim()) {
-      Alert.alert(t("common.error"), t("billing.noteRequired"));
+      showToast(t("billing.noteRequired"), "error");
       return;
     }
 
     if (proofNote.trim().length < 10) {
-      Alert.alert(t("common.error"), t("billing.invalidNoteLength"));
+      showToast(t("billing.invalidNoteLength"), "error");
       return;
     }
 
     if (!selectedImage) {
-      Alert.alert(t("common.error"), t("billing.imageRequired"));
+      showToast(t("billing.imageRequired"), "error");
       return;
     }
 
@@ -100,14 +98,20 @@ export function UploadProofModal({
 
       uploadProof(formData, {
         onSuccess: () => {
+          showToast("Proof uploaded successfully", "success");
           setProofNote("");
           setSelectedImage(null);
           onClose();
         },
+        onError: (error: any) => {
+          const message =
+            error?.response?.data?.message || t("billing.uploadFailed");
+          showToast(message, "error");
+        },
       });
     } catch (error) {
       console.error("Error uploading proof:", error);
-      Alert.alert(t("common.error"), t("billing.uploadFailed"));
+      showToast(t("billing.uploadFailed"), "error");
     }
   };
 

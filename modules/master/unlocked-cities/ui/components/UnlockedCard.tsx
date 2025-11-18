@@ -10,6 +10,7 @@ import {
   View,
 } from "react-native";
 import type { UnlockedCity } from "../../types";
+import { useThemeColorPalette } from "@/hooks/use-theme-color-palette";
 
 export function UnlockedCard({
   city,
@@ -24,26 +25,15 @@ export function UnlockedCard({
 }) {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
-  const cardBg = useThemeColor(
-    { light: "#FFFFFF", dark: "#1F2937" },
-    "background"
-  );
-  const borderColor = useThemeColor(
-    { light: "#E5E7EB", dark: "#374151" },
-    "text"
-  );
-  const tint = useThemeColor(
-    { light: "#3B82F6", dark: "#2563EB" },
-    "tint"
-  );
+  const colors = useThemeColorPalette();
 
   return (
     <View
       style={[
         styles.card,
         {
-          backgroundColor: cardBg,
-          borderColor: borderColor,
+          backgroundColor: colors.cardBackground,
+          borderColor: colors.border,
         },
         isDark && styles.cardDark,
       ]}
@@ -51,8 +41,8 @@ export function UnlockedCard({
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <View style={[styles.locationIcon, { backgroundColor: "rgba(59, 130, 246, 0.1)" }]}>
-            <Ionicons name="location" size={18} color={tint} />
+          <View style={[styles.locationIcon, { backgroundColor: `${colors.primary}1A` }]}>
+            <Ionicons name="location" size={18} color={colors.primary} />
           </View>
           <View style={styles.headerText}>
             <ThemedText type="subtitle" style={styles.cityName} numberOfLines={1} ellipsizeMode="tail">
@@ -66,13 +56,13 @@ export function UnlockedCard({
         <View
           style={[
             styles.statusBadge,
-            { backgroundColor: city.isActive ? "#10B981" : "#6B7280" },
+            { backgroundColor: city.isActive ? colors.availabilityNow : colors.mutedIcon },
           ]}
         >
           <Ionicons
             name={city.isActive ? "checkmark" : "close"}
             size={10}
-            color="#FFFFFF"
+            color={colors.white}
           />
         </View>
       </View>
@@ -81,7 +71,7 @@ export function UnlockedCard({
       <View style={styles.details}>
         <View style={styles.detailItem}>
           <View style={styles.detailIconContainer}>
-            <Ionicons name="trophy" size={13} color="#F59E0B" />
+            <Ionicons name="trophy" size={13} color={colors.warning} />
           </View>
           <ThemedText style={styles.detailText} numberOfLines={1}>
             {city.unlockCost} pts
@@ -89,7 +79,7 @@ export function UnlockedCard({
         </View>
         <View style={styles.detailItem}>
           <View style={styles.detailIconContainer}>
-            <Ionicons name="calendar-outline" size={13} color="#6B7280" />
+            <Ionicons name="calendar-outline" size={13} color={colors.mutedIcon} />
           </View>
           <ThemedText style={styles.detailText} numberOfLines={1}>
             {unlockedDate}
@@ -103,20 +93,24 @@ export function UnlockedCard({
         disabled={isPending}
         style={[
           styles.removeButton,
+          { 
+            backgroundColor: colors.error,
+            shadowColor: colors.error,
+          },
           isPending && styles.removeButtonDisabled,
         ]}
         activeOpacity={0.7}
       >
         {isPending ? (
-          <ActivityIndicator color="#FFFFFF" size="small" />
+          <ActivityIndicator color={colors.white} size="small" />
         ) : (
           <>
-            <Ionicons name="trash-outline" size={13} color="#FFFFFF" />
-            <ThemedText
-              style={styles.removeButtonText}
-              lightColor="#FFFFFF"
-              darkColor="#FFFFFF"
-            >
+            <Ionicons name="trash-outline" size={13} color={colors.white} />
+              <ThemedText
+                style={styles.removeButtonText}
+                lightColor={colors.white}
+                darkColor={colors.white}
+              >
               Remove
             </ThemedText>
           </>
@@ -216,13 +210,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: 6,
-    backgroundColor: "#EF4444",
     paddingVertical: 10,
     borderRadius: 8,
     marginTop: 4,
     ...Platform.select({
       ios: {
-        shadowColor: "#EF4444",
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.2,
         shadowRadius: 4,

@@ -1,6 +1,5 @@
 import { ThemedText } from "@/components/themed-text";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { useThemeColor } from "@/hooks/use-theme-color";
 import { Ionicons } from "@expo/vector-icons";
 import {
     ActivityIndicator,
@@ -10,6 +9,7 @@ import {
     View,
 } from "react-native";
 import type { CityPart } from "../../types";
+import { useThemeColorPalette } from "@/hooks/use-theme-color-palette";
 
 export function CityPartsGrid({
   parts,
@@ -22,18 +22,7 @@ export function CityPartsGrid({
 }) {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
-  const cardBg = useThemeColor(
-    { light: "#FFFFFF", dark: "#1F2937" },
-    "background"
-  );
-  const borderColor = useThemeColor(
-    { light: "#E5E7EB", dark: "#374151" },
-    "text"
-  );
-  const tint = useThemeColor(
-    { light: "#3B82F6", dark: "#2563EB" },
-    "tint"
-  );
+  const colors = useThemeColorPalette();
 
   return (
     <View style={styles.grid}>
@@ -44,19 +33,19 @@ export function CityPartsGrid({
             key={part.id}
             style={[
               styles.card,
-              { backgroundColor: cardBg, borderColor },
+              { backgroundColor: colors.cardBackground, borderColor: colors.border },
               isDark && styles.cardDark,
             ]}
           >
             <View style={styles.header}>
-              <Ionicons name="location" size={16} color={tint} />
+              <Ionicons name="location" size={16} color={colors.primary} />
               <ThemedText type="subtitle" style={styles.partName} numberOfLines={1} ellipsizeMode="tail">
                 {part.name}
               </ThemedText>
             </View>
-            <View style={styles.costContainer}>
-              <Ionicons name="trophy" size={14} color="#F59E0B" />
-              <ThemedText style={styles.costText} numberOfLines={1}>
+            <View style={[styles.costContainer, { backgroundColor: `${colors.warning}1A` }]}>
+              <Ionicons name="trophy" size={14} color={colors.warning} />
+              <ThemedText style={[styles.costText, { color: colors.warning }]} numberOfLines={1}>
                 {part.unlockCost} pts
               </ThemedText>
             </View>
@@ -65,20 +54,20 @@ export function CityPartsGrid({
               disabled={isUnlocking}
               style={[
                 styles.unlockButton,
-                { backgroundColor: tint },
+                { backgroundColor: colors.primary },
                 isUnlocking && styles.unlockButtonDisabled,
               ]}
               activeOpacity={0.7}
             >
               {isUnlocking ? (
-                <ActivityIndicator color="#FFFFFF" />
+                <ActivityIndicator color={colors.white} />
               ) : (
                 <>
-                  <Ionicons name="lock-open" size={14} color="#FFFFFF" />
+                  <Ionicons name="lock-open" size={14} color={colors.white} />
                   <ThemedText
                     style={styles.unlockButtonText}
-                    lightColor="#FFFFFF"
-                    darkColor="#FFFFFF"
+                    lightColor={colors.white}
+                    darkColor={colors.white}
                     numberOfLines={1}
                   >
                     Unlock ({part.unlockCost})
@@ -134,14 +123,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 4,
     padding: 6,
-    backgroundColor: "rgba(245, 158, 11, 0.1)",
     borderRadius: 6,
     flexShrink: 1,
   },
   costText: {
     fontSize: 11,
     fontWeight: "600",
-    color: "#F59E0B",
     flexShrink: 1,
   },
   unlockButton: {

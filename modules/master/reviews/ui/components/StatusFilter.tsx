@@ -2,7 +2,7 @@ import { View, StyleSheet, TouchableOpacity, Platform } from "react-native";
 import { ThemedText } from "@/components/themed-text";
 import { ReviewStatus } from "../../types";
 import { useTranslation } from "react-i18next";
-import { useThemeColor } from "@/hooks/use-theme-color";
+import { useThemeColorPalette } from "@/hooks/use-theme-color-palette";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -18,22 +18,7 @@ export function StatusFilter({
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
-  const tint = useThemeColor(
-    { light: "#3B82F6", dark: "#2563EB" },
-    "tint"
-  );
-  const inactiveBg = useThemeColor(
-    { light: "#FFFFFF", dark: "#1F2937" },
-    "background"
-  );
-  const inactiveBorder = useThemeColor(
-    { light: "#E5E7EB", dark: "#374151" },
-    "text"
-  );
-  const inactiveText = useThemeColor(
-    { light: "#6B7280", dark: "#9CA3AF" },
-    "text"
-  );
+  const colors = useThemeColorPalette();
 
   const statuses = [
     { label: t("reviews.all"), value: ReviewStatus.UNDEFINED, icon: "list" },
@@ -52,12 +37,12 @@ export function StatusFilter({
             style={[
               styles.chip,
               isActive
-                ? [styles.chipActive, { backgroundColor: tint, borderColor: tint }]
+                ? [styles.chipActive, { backgroundColor: colors.primary, borderColor: colors.primary }]
                 : [
                     styles.chipInactive,
                     {
-                      backgroundColor: inactiveBg,
-                      borderColor: inactiveBorder,
+                      backgroundColor: colors.cardBackground,
+                      borderColor: colors.border,
                     },
                   ],
             ]}
@@ -67,12 +52,12 @@ export function StatusFilter({
             <Ionicons
               name={status.icon as any}
               size={14}
-              color={isActive ? "#FFFFFF" : inactiveText}
+              color={isActive ? colors.white : colors.mutedIcon}
             />
             <ThemedText
               style={styles.chipText}
-              lightColor={isActive ? "#FFFFFF" : "#1F2937"}
-              darkColor={isActive ? "#FFFFFF" : "#E5E7EB"}
+              lightColor={isActive ? colors.white : colors.text}
+              darkColor={isActive ? colors.white : colors.text}
             >
               {status.label}
             </ThemedText>

@@ -12,7 +12,7 @@ import type {
   UseFormHandleSubmit,
 } from "react-hook-form";
 import { Controller, type Control } from "react-hook-form";
-import { useThemeColor } from "@/hooks/use-theme-color";
+import { useThemeColorPalette } from "@/hooks/use-theme-color-palette";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
@@ -42,24 +42,7 @@ export function AssignmentForm({
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
-  const borderColor = useThemeColor(
-    { light: "#E5E7EB", dark: "#374151" },
-    "text"
-  );
-  const errorBorderColor = "#EF4444";
-  const textColor = useThemeColor({}, "text");
-  const placeholderColor = useThemeColor(
-    { light: "#9CA3AF", dark: "#6B7280" },
-    "text"
-  );
-  const backgroundColor = useThemeColor(
-    { light: "#F9FAFB", dark: "#111827" },
-    "background"
-  );
-  const tint = useThemeColor(
-    { light: "#3B82F6", dark: "#2563EB" },
-    "tint"
-  );
+  const colors = useThemeColorPalette();
 
   const InputField = ({
     label,
@@ -80,21 +63,21 @@ export function AssignmentForm({
   }) => (
     <View style={styles.fieldContainer}>
       <View style={styles.labelContainer}>
-        <Ionicons name={icon as any} size={16} color={isDark ? "#9CA3AF" : "#6B7280"} />
+        <Ionicons name={icon as any} size={16} color={colors.mutedIcon} />
         <ThemedText style={styles.label}>{label}</ThemedText>
       </View>
       {name === "note" ? (
         <TextInput
           {...(register(name) as any)}
           placeholder={placeholder}
-          placeholderTextColor={placeholderColor}
+          placeholderTextColor={colors.mutedIcon}
           multiline={isMultiline}
           numberOfLines={isMultiline ? 4 : 1}
           textAlignVertical={isMultiline ? "top" : "center"}
           style={[
             styles.input,
             styles.multilineInput,
-            { borderColor: error ? errorBorderColor : borderColor, backgroundColor, color: textColor },
+            { borderColor: error ? colors.error : colors.border, backgroundColor: colors.cardBackground, color: colors.text },
             isDark && styles.inputDark,
           ]}
         />
@@ -109,10 +92,10 @@ export function AssignmentForm({
               onBlur={onBlur}
               value={value !== undefined && value !== null ? String(value) : ""}
               placeholder={placeholder}
-              placeholderTextColor={placeholderColor}
+              placeholderTextColor={colors.mutedIcon}
               style={[
                 styles.input,
-                { borderColor: error ? errorBorderColor : borderColor, backgroundColor, color: textColor },
+                { borderColor: error ? colors.error : colors.border, backgroundColor: colors.cardBackground, color: colors.text },
                 isDark && styles.inputDark,
               ]}
             />
@@ -121,8 +104,8 @@ export function AssignmentForm({
       )}
       {error && (
         <View style={styles.errorContainer}>
-          <Ionicons name="alert-circle" size={14} color="#EF4444" />
-          <ThemedText style={styles.errorText}>{error}</ThemedText>
+          <Ionicons name="alert-circle" size={14} color={colors.error} />
+          <ThemedText style={[styles.errorText, { color: colors.error }]}>{error}</ThemedText>
         </View>
       )}
     </View>
@@ -169,22 +152,22 @@ export function AssignmentForm({
           style={[styles.button, styles.backButton]}
           activeOpacity={0.7}
         >
-          <Ionicons name="arrow-back" size={18} color="#6B7280" />
-          <ThemedText style={styles.backButtonText}>Back</ThemedText>
+          <Ionicons name="arrow-back" size={18} color={colors.mutedIcon} />
+          <ThemedText style={[styles.backButtonText, { color: colors.mutedIcon }]}>Back</ThemedText>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={handleSubmit(onSubmit)}
-          style={[styles.button, { backgroundColor: tint }]}
+          style={[styles.button, { backgroundColor: colors.primary }]}
           activeOpacity={0.7}
         >
           <ThemedText
-            style={styles.nextButtonText}
-            lightColor="#FFFFFF"
-            darkColor="#FFFFFF"
+            style={[styles.nextButtonText, { color: colors.white }]}
+            lightColor={colors.white}
+            darkColor={colors.white}
           >
             Next
           </ThemedText>
-          <Ionicons name="arrow-forward" size={18} color="#FFFFFF" />
+          <Ionicons name="arrow-forward" size={18} color={colors.white} />
         </TouchableOpacity>
       </View>
     </View>
@@ -271,17 +254,13 @@ const styles = StyleSheet.create({
     }),
   },
   backButton: {
-    backgroundColor: "#F3F4F6",
     borderWidth: 1,
-    borderColor: "#E5E7EB",
   },
   backButtonText: {
-    color: "#6B7280",
     fontSize: 16,
     fontWeight: "600",
   },
   nextButtonText: {
-    color: "#FFFFFF",
     fontSize: 16,
     fontWeight: "600",
   },

@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { View, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import { View, StyleSheet, TouchableOpacity } from "react-native";
 import { ThemedText } from "@/components/themed-text";
 import { useAcceptDeclineLead } from "../../hooks/use-accept-decline-lead";
 import { LeadStatus } from "../../types";
 import { CompleteLeadModal } from "./CompleteLeadModal";
 import { useTranslation } from "react-i18next";
+import { useToast } from "@/components/toast";
 
 interface ActionButtonsProps {
   leadId: string;
@@ -18,13 +19,14 @@ export function ActionButtons({
   onComplete,
 }: ActionButtonsProps) {
   const { t } = useTranslation();
+  const { showToast } = useToast();
   const { mutate: acceptDeclineLead, isPending: isAcceptDeclinePending } =
     useAcceptDeclineLead();
   const [isCompleteModalVisible, setIsCompleteModalVisible] = useState(false);
 
   const handleAccept = () => {
     if (status !== "pending") {
-      Alert.alert(t("leads.cannotAccept"), t("leads.cannotAcceptDescription"));
+      showToast(t("leads.cannotAcceptDescription"), "warning");
       return;
     }
     acceptDeclineLead(
@@ -33,7 +35,7 @@ export function ActionButtons({
         onError: (error: any) => {
           const message =
             error?.response?.data?.message || t("leads.failedToAccept");
-          Alert.alert(t("common.error"), message);
+          showToast(message, "error");
         },
       }
     );
@@ -41,10 +43,7 @@ export function ActionButtons({
 
   const handleDecline = () => {
     if (status !== "pending") {
-      Alert.alert(
-        t("leads.cannotDecline"),
-        t("leads.cannotDeclineDescription")
-      );
+      showToast(t("leads.cannotDeclineDescription"), "warning");
       return;
     }
     acceptDeclineLead(
@@ -53,7 +52,7 @@ export function ActionButtons({
         onError: (error: any) => {
           const message =
             error?.response?.data?.message || t("leads.failedToDecline");
-          Alert.alert(t("common.error"), message);
+          showToast(message, "error");
         },
       }
     );

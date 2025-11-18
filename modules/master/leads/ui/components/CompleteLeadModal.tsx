@@ -1,16 +1,18 @@
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
+import { useToast } from "@/components/toast";
+import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useThemeColorPalette } from "@/hooks/use-theme-color-palette";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
-  View,
   Modal,
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  Alert,
+  View,
 } from "react-native";
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
 import { useCompleteLead } from "../../hooks/use-complete-lead";
-import { useTranslation } from "react-i18next";
 
 interface CompleteLeadModalProps {
   visible: boolean;
@@ -24,6 +26,10 @@ export function CompleteLeadModal({
   leadId,
 }: CompleteLeadModalProps) {
   const { t } = useTranslation();
+  const { showToast } = useToast();
+  const colors = useThemeColorPalette();
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
   const [price, setPrice] = useState("");
   const { mutate: completeLead, isPending } = useCompleteLead();
 
@@ -43,7 +49,7 @@ export function CompleteLeadModal({
         onError: (error: any) => {
           const message =
             error?.response?.data?.message || t("leads.failedToComplete");
-          Alert.alert(t("common.error"), message);
+          showToast(message, "error");
         },
       }
     );
@@ -76,20 +82,32 @@ export function CompleteLeadModal({
 
           <View style={styles.inputContainer}>
             <ThemedText style={styles.label}>{t("leads.price")}</ThemedText>
-            <View style={styles.inputWrapper}>
+            <View
+              style={[
+                styles.inputWrapper,
+                {
+                  borderColor: colors.border,
+                  backgroundColor: colors.secondaryBackground,
+                },
+              ]}
+            >
               <TextInput
-                style={styles.input}
+                style={[styles.input, { color: colors.text }]}
                 placeholder="0.00"
-                placeholderTextColor="#94a3b8"
+                placeholderTextColor={colors.mutedIcon}
                 value={price}
                 onChangeText={setPrice}
                 keyboardType="decimal-pad"
                 autoFocus
               />
-              <ThemedText style={styles.currency}>₾</ThemedText>
+              <ThemedText
+                style={[styles.currency, { color: colors.mutedIcon }]}
+              >
+                ₾
+              </ThemedText>
             </View>
             {price && !isValidPrice && (
-              <ThemedText style={styles.errorText}>
+              <ThemedText style={[styles.errorText, { color: colors.error }]}>
                 {t("leads.invalidPrice")}
               </ThemedText>
             )}
@@ -97,12 +115,18 @@ export function CompleteLeadModal({
 
           <View style={styles.buttonRow}>
             <TouchableOpacity
-              style={[styles.button, styles.cancelButton]}
+              style={[
+                styles.button,
+                styles.cancelButton,
+                { backgroundColor: colors.secondaryBackground },
+              ]}
               onPress={handleClose}
               disabled={isPending}
               activeOpacity={0.7}
             >
-              <ThemedText style={styles.cancelButtonText}>
+              <ThemedText
+                style={[styles.cancelButtonText, { color: colors.mutedIcon }]}
+              >
                 {t("common.cancel")}
               </ThemedText>
             </TouchableOpacity>
@@ -110,13 +134,21 @@ export function CompleteLeadModal({
               style={[
                 styles.button,
                 styles.submitButton,
+                {
+                  backgroundColor:
+                    !isValidPrice || isPending
+                      ? colors.mutedIcon
+                      : colors.primary,
+                },
                 (!isValidPrice || isPending) && styles.submitButtonDisabled,
               ]}
               onPress={handleSubmit}
               disabled={isPending || !isValidPrice}
               activeOpacity={0.7}
             >
-              <ThemedText style={styles.submitButtonText}>
+              <ThemedText
+                style={[styles.submitButtonText, { color: colors.white }]}
+              >
                 {isPending ? t("leads.completing") : t("leads.completeLead")}
               </ThemedText>
             </TouchableOpacity>
@@ -134,7 +166,6 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   modalContent: {
-    backgroundColor: "white",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 24,
@@ -163,9 +194,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     borderWidth: 2,
-    borderColor: "#e2e8f0",
     borderRadius: 12,
-    backgroundColor: "#f8fafc",
     overflow: "hidden",
   },
   input: {
@@ -178,10 +207,8 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "600",
     paddingRight: 16,
-    color: "#64748b",
   },
   errorText: {
-    color: "#ef4444",
     fontSize: 14,
     marginTop: 8,
   },
@@ -195,23 +222,16 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: "center",
   },
-  cancelButton: {
-    backgroundColor: "#f1f5f9",
-  },
-  submitButton: {
-    backgroundColor: "#2563eb",
-  },
+  cancelButton: {},
+  submitButton: {},
   submitButtonDisabled: {
-    backgroundColor: "#cbd5e1",
     opacity: 0.6,
   },
   cancelButtonText: {
-    color: "#64748b",
     fontSize: 16,
     fontWeight: "600",
   },
   submitButtonText: {
-    color: "white",
     fontSize: 16,
     fontWeight: "600",
   },

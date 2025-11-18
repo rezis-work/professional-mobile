@@ -4,15 +4,15 @@ import {
   TouchableOpacity,
   View,
   Image,
-  Alert,
   StyleSheet,
   Platform,
 } from "react-native";
 import type { UseFormSetValue } from "react-hook-form";
 import type { ProfileFormValues } from "../../schema";
 import { useTranslation } from "react-i18next";
-import { useThemeColor } from "@/hooks/use-theme-color";
+import { useThemeColorPalette } from "@/hooks/use-theme-color-palette";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useToast } from "@/components/toast";
 import { Ionicons } from "@expo/vector-icons";
 
 export function ImagePickerInput({
@@ -23,21 +23,15 @@ export function ImagePickerInput({
   uri?: string;
 }) {
   const { t } = useTranslation();
+  const { showToast } = useToast();
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
-  const tint = useThemeColor(
-    { light: "#3B82F6", dark: "#2563EB" },
-    "tint"
-  );
-  const borderColor = useThemeColor(
-    { light: "#E5E7EB", dark: "#374151" },
-    "text"
-  );
+  const colors = useThemeColorPalette();
 
   return (
     <View style={styles.container}>
       <View style={styles.labelContainer}>
-        <Ionicons name="image" size={16} color={isDark ? "#9CA3AF" : "#6B7280"} />
+        <Ionicons name="image" size={16} color={colors.mutedIcon} />
         <ThemedText style={styles.label}>{t("settings.profileImage")}</ThemedText>
       </View>
       <View style={styles.content}>
@@ -45,15 +39,15 @@ export function ImagePickerInput({
           <View style={styles.imageContainer}>
             <Image source={{ uri }} style={styles.image} />
             <TouchableOpacity
-              style={styles.removeButton}
+              style={[styles.removeButton, { backgroundColor: colors.cardBackground }]}
               onPress={() => setValue("image", null, { shouldValidate: false })}
             >
-              <Ionicons name="close-circle" size={24} color="#EF4444" />
+              <Ionicons name="close-circle" size={24} color={colors.error} />
             </TouchableOpacity>
           </View>
         ) : (
-          <View style={[styles.placeholder, { borderColor }]}>
-            <Ionicons name="camera" size={32} color={isDark ? "#6B7280" : "#9CA3AF"} />
+          <View style={[styles.placeholder, { borderColor: colors.border }]}>
+            <Ionicons name="camera" size={32} color={colors.mutedIcon} />
             <ThemedText style={styles.placeholderText}>
               {t("settings.profileImage")}
             </ThemedText>
@@ -64,7 +58,7 @@ export function ImagePickerInput({
             const { status } =
               await ExpoImagePicker.requestMediaLibraryPermissionsAsync();
             if (status !== "granted") {
-              Alert.alert(t("common.error"), t("settings.permissionRequired"));
+              showToast(t("settings.permissionRequired"), "warning");
               return;
             }
             const result = await ExpoImagePicker.launchImageLibraryAsync({
@@ -83,11 +77,11 @@ export function ImagePickerInput({
               );
             }
           }}
-          style={[styles.pickButton, { backgroundColor: tint }]}
+          style={[styles.pickButton, { backgroundColor: colors.primary }]}
           activeOpacity={0.7}
         >
-          <Ionicons name="image-outline" size={18} color="#FFFFFF" />
-          <ThemedText style={styles.pickButtonText} lightColor="#FFFFFF" darkColor="#FFFFFF">
+          <Ionicons name="image-outline" size={18} color={colors.white} />
+          <ThemedText style={[styles.pickButtonText, { color: colors.white }]} lightColor={colors.white} darkColor={colors.white}>
             {uri ? t("settings.pickImage") : t("settings.pickImage")}
           </ThemedText>
         </TouchableOpacity>
@@ -121,13 +115,11 @@ const styles = StyleSheet.create({
     height: 100,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: "#E5E7EB",
   },
   removeButton: {
     position: "absolute",
     top: -8,
     right: -8,
-    backgroundColor: "#FFFFFF",
     borderRadius: 12,
     ...Platform.select({
       ios: {
@@ -178,7 +170,6 @@ const styles = StyleSheet.create({
     }),
   },
   pickButtonText: {
-    color: "#FFFFFF",
     fontSize: 14,
     fontWeight: "600",
   },

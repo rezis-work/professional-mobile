@@ -1,9 +1,9 @@
 import { ThemedText } from "@/components/themed-text";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { useThemeColor } from "@/hooks/use-theme-color";
 import { Ionicons } from "@expo/vector-icons";
 import { Image, Platform, StyleSheet, TouchableOpacity, View } from "react-native";
 import type { City } from "../../types";
+import { useThemeColorPalette } from "@/hooks/use-theme-color-palette";
 
 export function CitiesGrid({
   cities,
@@ -14,18 +14,7 @@ export function CitiesGrid({
 }) {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
-  const cardBg = useThemeColor(
-    { light: "#FFFFFF", dark: "#1F2937" },
-    "background"
-  );
-  const borderColor = useThemeColor(
-    { light: "#E5E7EB", dark: "#374151" },
-    "text"
-  );
-  const tint = useThemeColor(
-    { light: "#3B82F6", dark: "#2563EB" },
-    "tint"
-  );
+  const colors = useThemeColorPalette();
 
   return (
     <View style={styles.grid}>
@@ -36,8 +25,8 @@ export function CitiesGrid({
           style={[
             styles.card,
             {
-              backgroundColor: cardBg,
-              borderColor: city.isActive ? "#10B981" : borderColor,
+              backgroundColor: colors.cardBackground,
+              borderColor: city.isActive ? colors.availabilityNow : colors.border,
             },
             isDark && styles.cardDark,
           ]}
@@ -50,8 +39,8 @@ export function CitiesGrid({
               resizeMode="cover"
             />
             {city.isActive && (
-              <View style={styles.activeBadge}>
-                <Ionicons name="checkmark-circle" size={14} color="#FFFFFF" />
+              <View style={[styles.activeBadge, { backgroundColor: colors.availabilityNow }]}>
+                <Ionicons name="checkmark-circle" size={14} color={colors.white} />
               </View>
             )}
           </View>
@@ -63,12 +52,12 @@ export function CitiesGrid({
               <Ionicons
                 name="location"
                 size={12}
-                color={city.isActive ? "#10B981" : tint}
+                color={city.isActive ? colors.availabilityNow : colors.primary}
               />
               <ThemedText
                 style={[
                   styles.viewText,
-                  { color: city.isActive ? "#10B981" : tint },
+                  { color: city.isActive ? colors.availabilityNow : colors.primary },
                 ]}
                 numberOfLines={1}
               >
@@ -121,7 +110,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 6,
     right: 6,
-    backgroundColor: "#10B981",
     borderRadius: 10,
     padding: 3,
   },

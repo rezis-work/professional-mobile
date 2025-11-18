@@ -1,26 +1,13 @@
-import { View, StyleSheet } from "react-native";
-import { ThemedText } from "@/components/themed-text";
-import { BillingListView } from "@/modules/master/billing/ui/views/BillingListView";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { BillingListView } from "@/modules/master/billing/ui/views/BillingListView";
+import { StyleSheet } from "react-native";
 
 export default function BillingScreen() {
-  const backgroundColor = useThemeColor(
-    { light: "#F3F4F6", dark: "#000000" },
-    "background"
-  );
 
   return (
-    <View style={[styles.container, { backgroundColor }]}>
-      <View style={styles.header}>
-        <ThemedText type="title" style={styles.title}>
-          Billing
-        </ThemedText>
-        <ThemedText style={styles.subtitle}>
-          Manage your billing and payments
-        </ThemedText>
-      </View>
+    <>
       <BillingListView />
-    </View>
+    </>
   );
 }
 

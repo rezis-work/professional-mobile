@@ -1,6 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { uploadMasterProof } from "../services/billing";
-import { Alert } from "react-native";
 
 export const useUploadProof = () => {
   const queryClient = useQueryClient();
@@ -9,12 +8,8 @@ export const useUploadProof = () => {
     mutationFn: (data: FormData) => uploadMasterProof(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["master-billings"] });
-      Alert.alert("Success", "Proof uploaded successfully");
+      // Toast will be shown in component via onSuccess callback
     },
-    onError: (error: any) => {
-      const message =
-        error?.response?.data?.message || "Failed to upload proof";
-      Alert.alert("Error", message);
-    },
+    // Error handling will be done in component via onError callback
   });
 };

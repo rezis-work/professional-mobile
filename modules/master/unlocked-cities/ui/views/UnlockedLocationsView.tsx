@@ -2,7 +2,7 @@ import {
   ScrollView,
   View,
   StyleSheet,
-  ActivityIndicator,
+  ActivityIndicator
 } from "react-native";
 import { ThemedText } from "@/components/themed-text";
 import { useGetUnlockedMasterLocations } from "../../hooks/useGetUnlockedMasterLocations";
@@ -15,26 +15,15 @@ import {
 } from "../components/States";
 import { UnlockedCard } from "../components/UnlockedCard";
 import { useTranslation } from "react-i18next";
-import { useThemeColor } from "@/hooks/use-theme-color";
+import { useThemeColorPalette } from "@/hooks/use-theme-color-palette";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { Ionicons } from "@expo/vector-icons";
+
 
 export function UnlockedLocationsView() {
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
-  const backgroundColor = useThemeColor(
-    { light: "#F3F4F6", dark: "#000000" },
-    "background"
-  );
-  const cardBg = useThemeColor(
-    { light: "#FFFFFF", dark: "#1F2937" },
-    "background"
-  );
-  const tint = useThemeColor(
-    { light: "#3B82F6", dark: "#2563EB" },
-    "tint"
-  );
+  const colors = useThemeColorPalette();
 
   const { data, isLoading, isError, error } = useGetUnlockedMasterLocations();
   const { mutate: deleteUnlockedLocation, isPending } =
@@ -48,7 +37,7 @@ export function UnlockedLocationsView() {
 
   return (
     <ScrollView
-      style={{ flex: 1, backgroundColor }}
+      style={{ flex: 1, backgroundColor: colors.background }}
       contentContainerStyle={styles.scrollContent}
       showsVerticalScrollIndicator={false}
     >

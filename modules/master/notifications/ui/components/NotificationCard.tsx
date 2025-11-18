@@ -1,23 +1,32 @@
-import { View, StyleSheet, TouchableOpacity, Platform, ActivityIndicator } from "react-native";
 import { ThemedText } from "@/components/themed-text";
-import type { Notification } from "../../types";
-import { useMarkAsRead } from "../../hooks/use-mark-as-read";
-import { useThemeColor } from "@/hooks/use-theme-color";
+import { useToast } from "@/components/toast";
+import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useThemeColorPalette } from "@/hooks/use-theme-color-palette";
 import { Ionicons } from "@expo/vector-icons";
+import {
+  ActivityIndicator,
+  Platform,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { useMarkAsRead } from "../../hooks/use-mark-as-read";
+import type { Notification } from "../../types";
 
 interface NotificationCardProps {
   notification: Notification;
 }
 
 export function NotificationCard({ notification }: NotificationCardProps) {
-  const { mutate: markAsRead, isPending } = useMarkAsRead();
-  const cardBg = useThemeColor({}, "cardBackground");
-  const borderColor = useThemeColor({}, "border");
-  const tint = useThemeColor({}, "tint");
-  const unreadBadge = useThemeColor({}, "unreadBadge");
-  const mutedIcon = useThemeColor({}, "mutedIcon");
-  const secondaryBackground = useThemeColor({}, "secondaryBackground");
-  const success = useThemeColor({}, "success");
+  const { showToast } = useToast();
+  const { mutate: markAsRead, isPending } = useMarkAsRead({
+    onError: () => {
+      showToast("Failed to mark notification as read", "error");
+    },
+  });
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
+  const colors = useThemeColorPalette();
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -30,7 +39,11 @@ export function NotificationCard({ notification }: NotificationCardProps) {
 
   const getNotificationIcon = () => {
     if (notification.type.includes("lead")) return "briefcase";
-    if (notification.type.includes("payment") || notification.type.includes("billing")) return "cash";
+    if (
+      notification.type.includes("payment") ||
+      notification.type.includes("billing")
+    )
+      return "cash";
     if (notification.type.includes("review")) return "star";
     return "notifications";
   };
@@ -40,10 +53,11 @@ export function NotificationCard({ notification }: NotificationCardProps) {
       style={[
         styles.container,
         {
-          backgroundColor: cardBg,
-          borderColor: notification.read ? borderColor : tint,
+          backgroundColor: colors.cardBackground,
+          borderColor: notification.read ? colors.border : colors.primary,
           borderLeftWidth: notification.read ? 1.5 : 4,
         },
+        isDark && styles.cardDark,
       ]}
     >
       <View style={styles.header}>
@@ -53,15 +67,15 @@ export function NotificationCard({ notification }: NotificationCardProps) {
               styles.iconContainer,
               {
                 backgroundColor: notification.read
-                  ? `${mutedIcon}1A`
-                  : `${unreadBadge}1A`,
+                  ? `${colors.mutedIcon}1A`
+                  : `${colors.primary}1A`,
               },
             ]}
           >
             <Ionicons
               name={getNotificationIcon() as any}
               size={20}
-              color={notification.read ? mutedIcon : tint}
+              color={notification.read ? colors.mutedIcon : colors.primary}
             />
           </View>
           <View style={styles.headerText}>
@@ -74,8 +88,18 @@ export function NotificationCard({ notification }: NotificationCardProps) {
           </View>
         </View>
         {!notification.read && (
-          <View style={[styles.unreadBadge, { backgroundColor: unreadBadge }]}>
-            <View style={[styles.unreadDot, { backgroundColor: unreadBadge }]} />
+          <View
+            style={[
+              styles.unreadBadge,
+              { backgroundColor: colors.unreadBadge },
+            ]}
+          >
+            <View
+              style={[
+                styles.unreadDot,
+                { backgroundColor: colors.unreadBadge },
+              ]}
+            />
           </View>
         )}
       </View>
@@ -85,10 +109,19 @@ export function NotificationCard({ notification }: NotificationCardProps) {
       </ThemedText>
 
       {notification.data && Object.keys(notification.data).length > 0 && (
-        <View style={[styles.dataContainer, { backgroundColor: secondaryBackground }]}>
+        <View
+          style={[
+            styles.dataContainer,
+            { backgroundColor: colors.secondaryBackground },
+          ]}
+        >
           {notification.data.leadId && (
             <View style={styles.dataRow}>
-              <Ionicons name="document-text" size={14} color={mutedIcon} />
+              <Ionicons
+                name="document-text"
+                size={14}
+                color={colors.mutedIcon}
+              />
               <ThemedText style={styles.dataLabel}>Lead ID:</ThemedText>
               <ThemedText style={styles.dataValue}>
                 {notification.data.leadId}
@@ -97,16 +130,16 @@ export function NotificationCard({ notification }: NotificationCardProps) {
           )}
           {notification.data.amount && (
             <View style={styles.dataRow}>
-              <Ionicons name="cash" size={14} color={success} />
+              <Ionicons name="cash" size={14} color={colors.success} />
               <ThemedText style={styles.dataLabel}>Amount:</ThemedText>
-              <ThemedText style={[styles.dataValue, { color: success }]}>
+              <ThemedText style={[styles.dataValue, { color: colors.success }]}>
                 {notification.data.amount} ₾
               </ThemedText>
             </View>
           )}
           {notification.data.clientName && (
             <View style={styles.dataRow}>
-              <Ionicons name="person" size={14} color={mutedIcon} />
+              <Ionicons name="person" size={14} color={colors.mutedIcon} />
               <ThemedText style={styles.dataLabel}>Client:</ThemedText>
               <ThemedText style={styles.dataValue}>
                 {notification.data.clientName}
@@ -120,7 +153,7 @@ export function NotificationCard({ notification }: NotificationCardProps) {
         style={[
           styles.button,
           {
-            backgroundColor: notification.read ? borderColor : tint,
+            backgroundColor: notification.read ? colors.border : colors.primary,
           },
           (isPending || notification.read) && styles.buttonDisabled,
         ]}
@@ -129,23 +162,30 @@ export function NotificationCard({ notification }: NotificationCardProps) {
         activeOpacity={0.7}
       >
         {isPending ? (
-          <ActivityIndicator color="#FFFFFF" size="small" />
+          <ActivityIndicator
+            color={notification.read ? colors.mutedIcon : colors.white}
+            size="small"
+          />
         ) : (
           <>
             <Ionicons
-              name={notification.read ? "checkmark-circle" : "checkmark-circle-outline"}
+              name={
+                notification.read
+                  ? "checkmark-circle"
+                  : "checkmark-circle-outline"
+              }
               size={16}
-              color={notification.read ? mutedIcon : "#FFFFFF"}
+              color={notification.read ? colors.mutedIcon : colors.white}
             />
             <ThemedText
               style={[
                 styles.buttonText,
                 notification.read
-                  ? { color: mutedIcon }
-                  : { color: "#FFFFFF" },
+                  ? { color: colors.mutedIcon }
+                  : { color: colors.white },
               ]}
-              lightColor={notification.read ? mutedIcon : "#FFFFFF"}
-              darkColor={notification.read ? mutedIcon : "#FFFFFF"}
+              lightColor={notification.read ? colors.mutedIcon : colors.white}
+              darkColor={notification.read ? colors.mutedIcon : colors.white}
             >
               {notification.read ? "Marked" : "Mark as Read"}
             </ThemedText>
@@ -172,6 +212,9 @@ const styles = StyleSheet.create({
         elevation: 3,
       },
     }),
+  },
+  cardDark: {
+    borderWidth: 1,
   },
   header: {
     flexDirection: "row",
@@ -250,6 +293,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 10,
     alignSelf: "flex-end",
+    minWidth: 120,
     ...Platform.select({
       ios: {
         shadowColor: "#000",

@@ -8,6 +8,7 @@ import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "@/lib/auth";
+import { ToastProvider } from "@/components/toast";
 
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import "@/lib/i18n";
@@ -24,19 +25,21 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <ThemeProvider
-          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-        >
-          <Stack initialRouteName="(auth)">
-            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-            <Stack.Screen name="(master)" options={{ headerShown: false }} />
-            <Stack.Screen
-              name="modal"
-              options={{ presentation: "modal", title: "Modal" }}
-            />
-          </Stack>
-          <StatusBar style="auto" />
-        </ThemeProvider>
+        <ToastProvider>
+          <ThemeProvider
+            value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+          >
+            <Stack initialRouteName="(auth)">
+              <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+              <Stack.Screen name="(master)" options={{ headerShown: false }} />
+              <Stack.Screen
+                name="modal"
+                options={{ presentation: "modal", title: "Modal" }}
+              />
+            </Stack>
+            <StatusBar style="auto" />
+          </ThemeProvider>
+        </ToastProvider>
       </AuthProvider>
     </QueryClientProvider>
   );

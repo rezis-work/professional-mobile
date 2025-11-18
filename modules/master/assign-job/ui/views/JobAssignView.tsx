@@ -24,26 +24,16 @@ import {
   type JobAssignmentFormData,
 } from "../components/AssignmentForm";
 import { useTranslation } from "react-i18next";
-import { useThemeColor } from "@/hooks/use-theme-color";
+import { useThemeColorPalette } from "@/hooks/use-theme-color-palette";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useToast } from "@/components/toast";
 import { Ionicons } from "@expo/vector-icons";
 
 export function JobAssignView() {
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
-  const cardBg = useThemeColor(
-    { light: "#F9FAFB", dark: "#111827" },
-    "background"
-  );
-  const backgroundColor = useThemeColor(
-    { light: "#F3F4F6", dark: "#000000" },
-    "background"
-  );
-  const tint = useThemeColor(
-    { light: "#3B82F6", dark: "#2563EB" },
-    "tint"
-  );
+  const colors = useThemeColorPalette();
+  const { showToast } = useToast();
 
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(
     null
@@ -120,13 +110,13 @@ export function JobAssignView() {
       },
       {
         onSuccess: () => {
-          Alert.alert(t("common.success"), "Job assigned successfully");
+          showToast("Job assigned successfully", "success");
           handleBackToCategories();
         },
         onError: (error: any) => {
-          Alert.alert(
-            t("common.error"),
-            error?.response?.data?.message || "Failed to assign job"
+          showToast(
+            error?.response?.data?.message || "Failed to assign job",
+            "error"
           );
         },
       }
@@ -157,7 +147,7 @@ export function JobAssignView() {
 
   return (
     <ScrollView
-      style={{ flex: 1, backgroundColor }}
+      style={{ flex: 1, backgroundColor: colors.background }}
       contentContainerStyle={styles.scrollContent}
       showsVerticalScrollIndicator={false}
     >
@@ -170,7 +160,7 @@ export function JobAssignView() {
               style={styles.backButton}
               activeOpacity={0.7}
             >
-              <Ionicons name="arrow-back" size={20} color={tint} />
+              <Ionicons name="arrow-back" size={20} color={colors.primary} />
             </TouchableOpacity>
           )}
           <ThemedText type="title" style={styles.title}>
@@ -184,15 +174,15 @@ export function JobAssignView() {
         <View>
           {categoriesLoading ? (
             <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color={tint} />
+              <ActivityIndicator size="large" color={colors.primary} />
               <ThemedText style={styles.loadingText}>
                 Loading categories...
               </ThemedText>
             </View>
           ) : categoriesError ? (
             <View style={styles.errorContainer}>
-              <Ionicons name="alert-circle" size={32} color="#EF4444" />
-              <ThemedText style={styles.errorText}>
+              <Ionicons name="alert-circle" size={32} color={colors.error} />
+              <ThemedText style={[styles.errorText, { color: colors.error }]}>
                 Failed to load categories
               </ThemedText>
             </View>
@@ -203,7 +193,7 @@ export function JobAssignView() {
             />
           ) : (
             <View style={styles.emptyContainer}>
-              <Ionicons name="folder-open" size={32} color="#9CA3AF" />
+              <Ionicons name="folder-open" size={32} color={colors.mutedIcon} />
               <ThemedText style={styles.emptyText}>No categories</ThemedText>
             </View>
           )}
@@ -215,19 +205,19 @@ export function JobAssignView() {
         <View>
           {jobsLoading ? (
             <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color={tint} />
+              <ActivityIndicator size="large" color={colors.primary} />
               <ThemedText style={styles.loadingText}>Loading jobs...</ThemedText>
             </View>
           ) : jobsError ? (
             <View style={styles.errorContainer}>
-              <Ionicons name="alert-circle" size={32} color="#EF4444" />
-              <ThemedText style={styles.errorText}>Failed to load jobs</ThemedText>
+              <Ionicons name="alert-circle" size={32} color={colors.error} />
+              <ThemedText style={[styles.errorText, { color: colors.error }]}>Failed to load jobs</ThemedText>
             </View>
           ) : jobsData?.data?.length ? (
             <JobsGrid jobs={jobsData.data} onSelect={handleJobSelect} />
           ) : (
             <View style={styles.emptyContainer}>
-              <Ionicons name="briefcase-outline" size={32} color="#9CA3AF" />
+              <Ionicons name="briefcase-outline" size={32} color={colors.mutedIcon} />
               <ThemedText style={styles.emptyText}>No jobs available</ThemedText>
             </View>
           )}
@@ -252,13 +242,13 @@ export function JobAssignView() {
       {step === "confirm" && selectedJob && (
         <View>
           <View style={styles.confirmHeader}>
-            <Ionicons name="checkmark-circle" size={48} color="#10B981" />
+            <Ionicons name="checkmark-circle" size={48} color={colors.success} />
             <ThemedText type="title" style={styles.confirmTitle}>
               Confirm Job Assignment
             </ThemedText>
           </View>
 
-          <View style={styles.confirmDetails}>
+          <View style={[styles.confirmDetails, { backgroundColor: `${colors.primary}0D` }]}>
             <View style={styles.confirmRow}>
               <ThemedText style={styles.confirmLabel}>Job:</ThemedText>
               <ThemedText style={styles.confirmValue}>
@@ -299,30 +289,37 @@ export function JobAssignView() {
           <View style={styles.confirmActions}>
             <TouchableOpacity
               onPress={() => setStep("details")}
-              style={[styles.confirmButton, styles.backConfirmButton]}
+              style={[
+                styles.confirmButton, 
+                styles.backConfirmButton,
+                { 
+                  backgroundColor: colors.secondaryBackground,
+                  borderColor: colors.border 
+                }
+              ]}
               activeOpacity={0.7}
             >
-              <ThemedText style={styles.backConfirmButtonText}>Edit</ThemedText>
+              <ThemedText style={[styles.backConfirmButtonText, { color: colors.mutedIcon }]}>Edit</ThemedText>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={handleConfirmAssignment}
               disabled={isAssigningJob}
               style={[
                 styles.confirmButton,
-                { backgroundColor: "#10B981" },
+                { backgroundColor: colors.success },
                 isAssigningJob && styles.confirmButtonDisabled,
               ]}
               activeOpacity={0.7}
             >
               {isAssigningJob ? (
-                <ActivityIndicator color="#FFFFFF" />
+                <ActivityIndicator color={colors.white} />
               ) : (
                 <>
-                  <Ionicons name="checkmark" size={20} color="#FFFFFF" />
+                  <Ionicons name="checkmark" size={20} color={colors.white} />
                   <ThemedText
-                    style={styles.confirmButtonText}
-                    lightColor="#FFFFFF"
-                    darkColor="#FFFFFF"
+                    style={[styles.confirmButtonText, { color: colors.white }]}
+                    lightColor={colors.white}
+                    darkColor={colors.white}
                   >
                     Confirm
                   </ThemedText>
@@ -353,7 +350,6 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "rgba(59, 130, 246, 0.1)",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -378,7 +374,6 @@ const styles = StyleSheet.create({
   },
   cardDark: {
     borderWidth: 1,
-    borderColor: "#374151",
   },
   loadingContainer: {
     alignItems: "center",
@@ -396,7 +391,6 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   errorText: {
-    color: "#EF4444",
     textAlign: "center",
   },
   emptyContainer: {
@@ -421,7 +415,6 @@ const styles = StyleSheet.create({
     gap: 16,
     marginBottom: 24,
     padding: 16,
-    backgroundColor: "rgba(59, 130, 246, 0.05)",
     borderRadius: 12,
   },
   confirmRow: {
@@ -466,12 +459,9 @@ const styles = StyleSheet.create({
     }),
   },
   backConfirmButton: {
-    backgroundColor: "#F3F4F6",
     borderWidth: 1,
-    borderColor: "#E5E7EB",
   },
   backConfirmButtonText: {
-    color: "#6B7280",
     fontSize: 16,
     fontWeight: "600",
   },
@@ -479,7 +469,6 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   confirmButtonText: {
-    color: "#FFFFFF",
     fontSize: 16,
     fontWeight: "600",
   },

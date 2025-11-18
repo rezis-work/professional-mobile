@@ -1,14 +1,19 @@
-import { useState } from "react";
-import { ScrollView, View, StyleSheet, RefreshControl, ActivityIndicator } from "react-native";
+import { Pagination } from "@/components/Pagination";
 import { ThemedText } from "@/components/themed-text";
+import { Ionicons } from "@expo/vector-icons";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import {
+  ActivityIndicator,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  View,
+} from "react-native";
+import { useGetMasterBillings } from "../../hooks/use-get-master-billings";
 import { BillingCard } from "../components/BillingCard";
 import { UploadProofModal } from "../components/UploadProofModal";
-import { Pagination } from "@/components/Pagination";
-import { useGetMasterBillings } from "../../hooks/use-get-master-billings";
-import { useTranslation } from "react-i18next";
-import { useThemeColor } from "@/hooks/use-theme-color";
-import { useColorScheme } from "@/hooks/use-color-scheme";
-import { Ionicons } from "@expo/vector-icons";
+import useThemeColorPalette from "@/hooks/use-theme-color-palette";
 
 export function BillingListView() {
   const { t } = useTranslation();
@@ -16,12 +21,7 @@ export function BillingListView() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedBillingId, setSelectedBillingId] = useState("");
   const limit = 10;
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
-  const backgroundColor = useThemeColor(
-    { light: "#F3F4F6", dark: "#000000" },
-    "background"
-  );
+  const colors = useThemeColorPalette();
 
   const { data, isLoading, error, refetch, isRefetching } =
     useGetMasterBillings({
@@ -40,24 +40,37 @@ export function BillingListView() {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor }]}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       {isLoading ? (
-        <View style={[styles.centerContainer, { backgroundColor }]}>
-          <ActivityIndicator size="large" color={isDark ? "#3B82F6" : "#2563EB"} />
-          <ThemedText style={styles.loadingText}>{t("billing.loadingBilling")}</ThemedText>
+        <View style={[styles.centerContainer, { backgroundColor: colors.background }]}>
+          <ActivityIndicator
+            size="large"
+            color={colors.primary}
+          />
+          <ThemedText style={styles.loadingText}>
+            {t("billing.loadingBilling")}
+          </ThemedText>
         </View>
       ) : error ? (
-        <View style={[styles.centerContainer, { backgroundColor }]}>
+        <View style={[styles.centerContainer, { backgroundColor: colors.background }]}>
           <Ionicons name="alert-circle" size={48} color="#EF4444" />
-          <ThemedText style={styles.errorTitle}>{t("billing.errorLoadingBilling")}</ThemedText>
+          <ThemedText style={styles.errorTitle}>
+            {t("billing.errorLoadingBilling")}
+          </ThemedText>
           <ThemedText style={styles.errorMessage}>
             {error instanceof Error ? error.message : "Unknown error"}
           </ThemedText>
         </View>
       ) : !data || !data.data.length ? (
-        <View style={[styles.centerContainer, { backgroundColor }]}>
-          <Ionicons name="receipt-outline" size={48} color={isDark ? "#6B7280" : "#9CA3AF"} />
-          <ThemedText style={styles.emptyText}>{t("billing.noBillingFound")}</ThemedText>
+        <View style={[styles.centerContainer, { backgroundColor: colors.background }]}>
+          <Ionicons
+            name="receipt-outline"
+            size={48}
+            color={colors.mutedIcon}
+          />
+          <ThemedText style={styles.emptyText}>
+            {t("billing.noBillingFound")}
+          </ThemedText>
         </View>
       ) : (
         <>

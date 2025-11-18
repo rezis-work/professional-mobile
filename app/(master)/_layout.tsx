@@ -11,6 +11,8 @@ export default function MasterLayout() {
   const tint = useThemeColor({}, "tint");
   const text = useThemeColor({}, "text");
   const background = useThemeColor({}, "background");
+  const error = useThemeColor({}, "error");
+  const white = useThemeColor({}, "white");
   const { user, isLoading } = useAuth();
   const { data: unreadData } = useGetUnreadCount();
   const unreadCount = unreadData?.unreadCount || 0;
@@ -27,6 +29,7 @@ export default function MasterLayout() {
         tabBarStyle: { backgroundColor: background },
         headerStyle: { backgroundColor: background },
         headerTitleStyle: { color: text },
+        headerShadowVisible: false,
       }}
     >
       <Tabs.Screen
@@ -114,8 +117,8 @@ export default function MasterLayout() {
             <View style={styles.iconContainer}>
               <Ionicons name="notifications" size={size} color={color} />
               {unreadCount > 0 && (
-                <View style={styles.badge}>
-                  <Text style={styles.badgeText}>
+                <View style={[styles.badge, { backgroundColor: error }]}>
+                  <Text style={[styles.badgeText, { color: white }]}>
                     {unreadCount > 99 ? "99+" : unreadCount.toString()}
                   </Text>
                 </View>
@@ -161,13 +164,11 @@ const styles = StyleSheet.create({
     minWidth: 18,
     height: 18,
     borderRadius: 9,
-    backgroundColor: "#EF4444",
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 4,
   },
   badgeText: {
-    color: "#FFFFFF",
     fontSize: 10,
     fontWeight: "700",
     lineHeight: 12,

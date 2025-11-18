@@ -1,16 +1,20 @@
-import { useState } from "react";
-import {
-  ScrollView,
-  View,
-  StyleSheet,
-  ActivityIndicator,
-  TouchableOpacity,
-  Platform,
-} from "react-native";
 import { ThemedText } from "@/components/themed-text";
+import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useThemeColorPalette } from "@/hooks/use-theme-color-palette";
+import { Ionicons } from "@expo/vector-icons";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import {
+  ActivityIndicator,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useGetCities } from "../../hooks/useGetCities";
 import { useGetCityPart } from "../../hooks/useGetCityPart";
 import { useUnlockCity } from "../../hooks/useUnlockCity";
+import type { City, CityPart } from "../../types";
 import { CitiesGrid } from "../components/CitiesGrid";
 import { CityPartsGrid } from "../components/CityPartsGrid";
 import {
@@ -18,24 +22,11 @@ import {
   UnlockNoData,
   UnlockSkeleton,
 } from "../components/States";
-import type { City, CityPart } from "../../types";
-import { useTranslation } from "react-i18next";
-import { useThemeColor } from "@/hooks/use-theme-color";
-import { useColorScheme } from "@/hooks/use-color-scheme";
-import { Ionicons } from "@expo/vector-icons";
 
 export function UnlockCityView() {
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
-  const backgroundColor = useThemeColor(
-    { light: "#F3F4F6", dark: "#000000" },
-    "background"
-  );
-  const tint = useThemeColor(
-    { light: "#3B82F6", dark: "#2563EB" },
-    "tint"
-  );
+  const colors = useThemeColorPalette();
 
   const { data, isLoading, isError, error } = useGetCities();
   const { mutate: unlockCityMutation, isPending: isUnlockingCity } =
@@ -72,7 +63,7 @@ export function UnlockCityView() {
 
   return (
     <ScrollView
-      style={{ flex: 1, backgroundColor }}
+      style={{ flex: 1, backgroundColor: colors.background }}
       contentContainerStyle={styles.scrollContent}
       showsVerticalScrollIndicator={false}
     >
@@ -81,10 +72,13 @@ export function UnlockCityView() {
         {selectedCityId && selectedCity && (
           <TouchableOpacity
             onPress={onBack}
-            style={styles.backButton}
+            style={[
+              styles.backButton,
+              { backgroundColor: `${colors.primary}1A` },
+            ]}
             activeOpacity={0.7}
           >
-            <Ionicons name="arrow-back" size={20} color={tint} />
+            <Ionicons name="arrow-back" size={20} color={colors.primary} />
           </TouchableOpacity>
         )}
         <ThemedText type="title" style={styles.title}>
@@ -99,22 +93,28 @@ export function UnlockCityView() {
         <View>
           {isCityPartLoading ? (
             <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color={tint} />
+              <ActivityIndicator size="large" color={colors.primary} />
               <ThemedText style={styles.loadingText}>
                 Loading areas...
               </ThemedText>
             </View>
           ) : isCityPartError ? (
             <View style={styles.errorContainer}>
-              <Ionicons name="alert-circle" size={32} color="#EF4444" />
-              <ThemedText style={styles.errorText}>
+              <Ionicons name="alert-circle" size={32} color={colors.error} />
+              <ThemedText style={[styles.errorText, { color: colors.error }]}>
                 Failed to load areas for {selectedCity.name}
               </ThemedText>
             </View>
           ) : cityParts.length === 0 ? (
             <View style={styles.emptyContainer}>
-              <Ionicons name="location-outline" size={32} color="#9CA3AF" />
-              <ThemedText style={styles.emptyText}>No Areas Available</ThemedText>
+              <Ionicons
+                name="location-outline"
+                size={32}
+                color={colors.mutedIcon}
+              />
+              <ThemedText style={styles.emptyText}>
+                No Areas Available
+              </ThemedText>
             </View>
           ) : (
             <CityPartsGrid
@@ -146,7 +146,6 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "rgba(59, 130, 246, 0.1)",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -169,7 +168,6 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   errorText: {
-    color: "#EF4444",
     textAlign: "center",
   },
   emptyContainer: {

@@ -13,7 +13,7 @@ import { useAuth } from "@/lib/auth";
 import { useMasterProfileById } from "@/modules/master/profile/hooks/useMasterProfileById";
 import { useGetMasterLeadStats } from "@/modules/master/profile/hooks/use-get-master-lead-stats";
 import { useTranslation } from "react-i18next";
-import { useThemeColor } from "@/hooks/use-theme-color";
+import { useThemeColorPalette } from "@/hooks/use-theme-color-palette";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -99,24 +99,20 @@ export function MasterProfileView() {
 
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
-  const cardBg = useThemeColor(
-    { light: "#FFFFFF", dark: "#1F2937" },
-    "background"
-  );
-  const backgroundColor = useThemeColor({}, "background");
+  const colors = useThemeColorPalette();
 
   const getAvailabilityColor = (avail: string | null) => {
     switch (avail) {
       case "now":
-        return "#10B981";
+        return colors.availabilityNow;
       case "tomorrow":
-        return "#F59E0B";
+        return colors.availabilityTomorrow;
       case "next_week":
-        return "#3B82F6";
+        return colors.availabilityNextWeek;
       case "on_holiday":
-        return "#6B7280";
+        return colors.availabilityOnHoliday;
       default:
-        return "#6B7280";
+        return colors.availabilityOnHoliday;
     }
   };
 
@@ -137,7 +133,7 @@ export function MasterProfileView() {
 
   return (
     <ScrollView
-      style={{ flex: 1, backgroundColor }}
+      style={{ flex: 1, backgroundColor: colors.background }}
       contentContainerStyle={styles.scrollContent}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -148,16 +144,27 @@ export function MasterProfileView() {
       <View
         style={[
           styles.card,
-          { backgroundColor: cardBg },
-          isDark && styles.cardDark,
+          { backgroundColor: colors.cardBackground },
+          isDark && [styles.cardDark, { borderColor: colors.border }],
         ]}
       >
         <View style={styles.profileHeader}>
           {imageUrl ? (
-            <Image source={{ uri: imageUrl }} style={styles.profileImage} />
+            <Image 
+              source={{ uri: imageUrl }} 
+              style={[styles.profileImage, { borderColor: colors.border }]} 
+            />
           ) : (
-            <View style={styles.profileImagePlaceholder}>
-              <Ionicons name="person" size={40} color="#9CA3AF" />
+            <View 
+              style={[
+                styles.profileImagePlaceholder, 
+                { 
+                  backgroundColor: colors.secondaryBackground,
+                  borderColor: colors.border 
+                }
+              ]}
+            >
+              <Ionicons name="person" size={40} color={colors.mutedIcon} />
             </View>
           )}
           <View style={styles.profileInfo}>
@@ -166,7 +173,7 @@ export function MasterProfileView() {
             </ThemedText>
             {city && (
               <View style={styles.infoRow}>
-                <Ionicons name="location" size={16} color="#6B7280" />
+                <Ionicons name="location" size={16} color={colors.mutedIcon} />
                 <ThemedText style={styles.infoText}>{city}</ThemedText>
               </View>
             )}
@@ -192,12 +199,12 @@ export function MasterProfileView() {
         <View
           style={[
             styles.statCard,
-            { backgroundColor: cardBg },
-            isDark && styles.statCardDark,
+            { backgroundColor: colors.cardBackground },
+            isDark && [styles.statCardDark, { borderColor: colors.border }],
           ]}
         >
-          <View style={[styles.statIconContainer, { backgroundColor: "#3B82F6" }]}>
-            <Ionicons name="checkmark-circle" size={24} color="#FFFFFF" />
+          <View style={[styles.statIconContainer, { backgroundColor: colors.statBlue }]}>
+            <Ionicons name="checkmark-circle" size={24} color={colors.white} />
           </View>
           <ThemedText style={styles.statValue}>
             {masterStats.completedJobs ?? 0}
@@ -210,12 +217,12 @@ export function MasterProfileView() {
         <View
           style={[
             styles.statCard,
-            { backgroundColor: cardBg },
-            isDark && styles.statCardDark,
+            { backgroundColor: colors.cardBackground },
+            isDark && [styles.statCardDark, { borderColor: colors.border }],
           ]}
         >
-          <View style={[styles.statIconContainer, { backgroundColor: "#F59E0B" }]}>
-            <Ionicons name="star" size={24} color="#FFFFFF" />
+          <View style={[styles.statIconContainer, { backgroundColor: colors.statAmber }]}>
+            <Ionicons name="star" size={24} color={colors.white} />
           </View>
           <ThemedText style={styles.statValue}>
             {(masterStats.averageRating ?? 0).toFixed(1)}
@@ -228,12 +235,12 @@ export function MasterProfileView() {
         <View
           style={[
             styles.statCard,
-            { backgroundColor: cardBg },
-            isDark && styles.statCardDark,
+            { backgroundColor: colors.cardBackground },
+            isDark && [styles.statCardDark, { borderColor: colors.border }],
           ]}
         >
-          <View style={[styles.statIconContainer, { backgroundColor: "#10B981" }]}>
-            <Ionicons name="trophy" size={24} color="#FFFFFF" />
+          <View style={[styles.statIconContainer, { backgroundColor: colors.statGreen }]}>
+            <Ionicons name="trophy" size={24} color={colors.white} />
           </View>
           <ThemedText style={styles.statValue}>
             {masterStats.points ?? 0}
@@ -246,12 +253,12 @@ export function MasterProfileView() {
         <View
           style={[
             styles.statCard,
-            { backgroundColor: cardBg },
-            isDark && styles.statCardDark,
+            { backgroundColor: colors.cardBackground },
+            isDark && [styles.statCardDark, { borderColor: colors.border }],
           ]}
         >
-          <View style={[styles.statIconContainer, { backgroundColor: "#8B5CF6" }]}>
-            <Ionicons name="cash" size={24} color="#FFFFFF" />
+          <View style={[styles.statIconContainer, { backgroundColor: colors.statPurple }]}>
+            <Ionicons name="cash" size={24} color={colors.white} />
           </View>
           <ThemedText style={styles.statValue}>
             {(masterStats.totalEarnings ?? 0).toFixed(0)}
@@ -267,7 +274,7 @@ export function MasterProfileView() {
         <View
           style={[
             styles.card,
-            { backgroundColor: cardBg },
+            { backgroundColor: colors.cardBackground },
             isDark && styles.cardDark,
           ]}
         >
@@ -282,8 +289,8 @@ export function MasterProfileView() {
       <View
         style={[
           styles.card,
-          { backgroundColor: cardBg },
-          isDark && styles.cardDark,
+          { backgroundColor: colors.cardBackground },
+          isDark && [styles.cardDark, { borderColor: colors.border }],
         ]}
       >
         <ThemedText type="subtitle" style={styles.cardTitle}>
@@ -307,7 +314,7 @@ export function MasterProfileView() {
             </ThemedText>
           </View>
           <View style={styles.leadStatItem}>
-            <ThemedText style={[styles.leadStatValue, { color: "#10B981" }]}>
+            <ThemedText style={[styles.leadStatValue, { color: colors.success }]}>
               {acceptedLeads ?? 0}
             </ThemedText>
             <ThemedText style={styles.leadStatLabel}>
@@ -315,7 +322,7 @@ export function MasterProfileView() {
             </ThemedText>
           </View>
           <View style={styles.leadStatItem}>
-            <ThemedText style={[styles.leadStatValue, { color: "#EF4444" }]}>
+            <ThemedText style={[styles.leadStatValue, { color: colors.error }]}>
               {declinedLeads ?? 0}
             </ThemedText>
             <ThemedText style={styles.leadStatLabel}>
@@ -368,7 +375,6 @@ const styles = StyleSheet.create({
   },
   cardDark: {
     borderWidth: 1,
-    borderColor: "#374151",
   },
   cardTitle: {
     marginBottom: 12,
@@ -384,17 +390,14 @@ const styles = StyleSheet.create({
     height: 80,
     borderRadius: 40,
     borderWidth: 3,
-    borderColor: "#E5E7EB",
   },
   profileImagePlaceholder: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: "#F3F4F6",
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 3,
-    borderColor: "#E5E7EB",
   },
   profileInfo: {
     flex: 1,
@@ -443,7 +446,6 @@ const styles = StyleSheet.create({
   },
   statCardDark: {
     borderWidth: 1,
-    borderColor: "#374151",
   },
   statIconContainer: {
     width: 48,
