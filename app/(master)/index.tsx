@@ -1,6 +1,7 @@
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
+import { useToast } from "@/components/toast";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useAuth } from "@/lib/auth";
@@ -11,7 +12,6 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
-  Alert,
   Platform,
   RefreshControl,
   ScrollView,
@@ -23,6 +23,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function MasterDashboardScreen() {
   const { logout, user, refetch: refetchAuth } = useAuth();
+  const { showToast } = useToast();
   const router = useRouter();
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
@@ -58,7 +59,7 @@ export default function MasterDashboardScreen() {
       await logout();
       // Navigation will happen automatically via app/index.tsx redirect when user becomes null
     } catch {
-      Alert.alert(t("common.error"), t("common.logoutFailed"));
+      showToast(t("common.logoutFailed"), "error");
     }
   };
 

@@ -1,4 +1,5 @@
 import { ThemedText } from "@/components/themed-text";
+import { useToast } from "@/components/toast";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import api from "@/lib/api";
@@ -11,7 +12,6 @@ import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   ActivityIndicator,
-  Alert,
   Animated,
   Keyboard,
   Platform,
@@ -25,14 +25,19 @@ import { loginSchema, type LoginFormValues } from "./schema";
 
 export default function LoginScreen() {
   const router = useRouter();
+  const { showToast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [emailFocused, setEmailFocused] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
   const qc = useQueryClient();
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
   const translateY = useRef(new Animated.Value(0)).current;
   const passwordInputRef = useRef<TextInput>(null);
+  const emailErrorOpacity = useRef(new Animated.Value(0)).current;
+  const passwordErrorOpacity = useRef(new Animated.Value(0)).current;
+  const serverErrorOpacity = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     const keyboardWillShow = Keyboard.addListener(
@@ -94,6 +99,7 @@ export default function LoginScreen() {
     },
     onSuccess: async (data) => {
       logger.info("Login success", data);
+      setServerError(null); // Clear server error on success
       // Optimistically set user to unlock guarded routes immediately
       if (data?.user) {
         qc.setQueryData(["me"], data.user);
@@ -101,16 +107,44 @@ export default function LoginScreen() {
       await qc.invalidateQueries({ queryKey: ["me"] });
       await qc.refetchQueries({ queryKey: ["me"] });
       router.replace("/(master)");
-      Alert.alert("Signed in", "Welcome back!");
+      showToast("Welcome back!", "success");
     },
     onError: (err: any) => {
       const message = err?.response?.data?.message || "Login failed";
       logger.error("Login failed", err);
-      Alert.alert("Error", message);
+      setServerError(message);
     },
   });
 
+  // Animate email error
+  useEffect(() => {
+    Animated.timing(emailErrorOpacity, {
+      toValue: errors.email ? 1 : 0,
+      duration: 200,
+      useNativeDriver: true,
+    }).start();
+  }, [errors.email, emailErrorOpacity]);
+
+  // Animate password error
+  useEffect(() => {
+    Animated.timing(passwordErrorOpacity, {
+      toValue: errors.password && !errors.email && !serverError ? 1 : 0,
+      duration: 200,
+      useNativeDriver: true,
+    }).start();
+  }, [errors.password, errors.email, serverError, passwordErrorOpacity]);
+
+  // Animate server error
+  useEffect(() => {
+    Animated.timing(serverErrorOpacity, {
+      toValue: serverError && !errors.email && !errors.password ? 1 : 0,
+      duration: 200,
+      useNativeDriver: true,
+    }).start();
+  }, [serverError, errors.email, errors.password, serverErrorOpacity]);
+
   const onSubmit = (data: LoginFormValues) => {
+    setServerError(null); // Clear server error when submitting
     mutate(data);
   };
 
@@ -151,7 +185,7 @@ export default function LoginScreen() {
           {/* Form */}
           <View style={styles.form}>
             {/* Email Input */}
-            <View style={styles.inputWrapper}>
+            <View>
               <Controller
                 control={control}
                 name="email"
@@ -161,15 +195,16 @@ export default function LoginScreen() {
                       style={[
                         styles.inputContainer,
                         emailFocused && styles.inputFocused,
-                        errors.email && styles.inputError,
+                        (serverError || errors.email) && styles.inputError,
                         {
-                          borderColor: errors.email
-                            ? errorColor
-                            : emailFocused
-                            ? "#3B82F6"
-                            : isDark
-                            ? "#4B5563"
-                            : "#D1D5DB",
+                          borderColor:
+                            serverError || errors.email
+                              ? errorColor
+                              : emailFocused
+                              ? "#3B82F6"
+                              : isDark
+                              ? "#4B5563"
+                              : "#D1D5DB",
                           backgroundColor: inputBg,
                         },
                       ]}
@@ -178,7 +213,7 @@ export default function LoginScreen() {
                         name="mail-outline"
                         size={20}
                         color={
-                          errors.email
+                          serverError || errors.email
                             ? errorColor
                             : emailFocused
                             ? "#3B82F6"
@@ -197,7 +232,10 @@ export default function LoginScreen() {
                         textContentType="emailAddress"
                         returnKeyType="next"
                         value={value}
-                        onChangeText={onChange}
+                        onChangeText={(text) => {
+                          onChange(text);
+                          setServerError(null); // Clear server error when typing
+                        }}
                         onFocus={() => setEmailFocused(true)}
                         onBlur={() => {
                           setEmailFocused(false);
@@ -210,20 +248,13 @@ export default function LoginScreen() {
                         editable={!isPending && !isSubmitting}
                       />
                     </View>
-                    {errors.email && (
-                      <ThemedText
-                        style={[styles.errorText, { color: errorColor }]}
-                      >
-                        {errors.email.message}
-                      </ThemedText>
-                    )}
                   </>
                 )}
               />
             </View>
 
             {/* Password Input */}
-            <View style={styles.inputWrapper}>
+            <View>
               <Controller
                 control={control}
                 name="password"
@@ -233,15 +264,16 @@ export default function LoginScreen() {
                       style={[
                         styles.inputContainer,
                         passwordFocused && styles.inputFocused,
-                        errors.password && styles.inputError,
+                        (serverError || errors.password) && styles.inputError,
                         {
-                          borderColor: errors.password
-                            ? errorColor
-                            : passwordFocused
-                            ? "#3B82F6"
-                            : isDark
-                            ? "#4B5563"
-                            : "#D1D5DB",
+                          borderColor:
+                            serverError || errors.password
+                              ? errorColor
+                              : passwordFocused
+                              ? "#3B82F6"
+                              : isDark
+                              ? "#4B5563"
+                              : "#D1D5DB",
                           backgroundColor: inputBg,
                         },
                       ]}
@@ -250,7 +282,7 @@ export default function LoginScreen() {
                         name="lock-closed-outline"
                         size={20}
                         color={
-                          errors.password
+                          serverError || errors.password
                             ? errorColor
                             : passwordFocused
                             ? "#3B82F6"
@@ -269,14 +301,16 @@ export default function LoginScreen() {
                         textContentType="password"
                         returnKeyType="done"
                         value={value}
-                        onChangeText={onChange}
+                        onChangeText={(text) => {
+                          onChange(text);
+                          setServerError(null); // Clear server error when typing
+                        }}
                         onFocus={() => setPasswordFocused(true)}
                         onBlur={() => {
                           setPasswordFocused(false);
                           onBlur();
                         }}
                         onSubmitEditing={handleSubmit(onSubmit)}
-                        blurOnSubmit={true}
                         style={[styles.input, { color: textColor, flex: 1 }]}
                         editable={!isPending && !isSubmitting}
                       />
@@ -294,13 +328,71 @@ export default function LoginScreen() {
                         />
                       </TouchableOpacity>
                     </View>
-                    {errors.password && (
-                      <ThemedText
-                        style={[styles.errorText, { color: errorColor }]}
-                      >
-                        {errors.password.message}
-                      </ThemedText>
-                    )}
+                    <View style={styles.errorContainer}>
+                      {errors.email ? (
+                        <Animated.View
+                          style={{
+                            opacity: emailErrorOpacity,
+                            transform: [
+                              {
+                                translateY: emailErrorOpacity.interpolate({
+                                  inputRange: [0, 1],
+                                  outputRange: [-8, 0],
+                                }),
+                              },
+                            ],
+                          }}
+                        >
+                          <ThemedText
+                            style={[styles.errorText, { color: errorColor }]}
+                          >
+                            {errors.email.message}
+                          </ThemedText>
+                        </Animated.View>
+                      ) : errors.password ? (
+                        <Animated.View
+                          style={{
+                            opacity: passwordErrorOpacity,
+                            transform: [
+                              {
+                                translateY: passwordErrorOpacity.interpolate({
+                                  inputRange: [0, 1],
+                                  outputRange: [-8, 0],
+                                }),
+                              },
+                            ],
+                          }}
+                        >
+                          <ThemedText
+                            style={[styles.errorText, { color: errorColor }]}
+                          >
+                            {errors.password.message}
+                          </ThemedText>
+                        </Animated.View>
+                      ) : serverError ? (
+                        <Animated.View
+                          style={{
+                            opacity: serverErrorOpacity,
+                            transform: [
+                              {
+                                translateY: serverErrorOpacity.interpolate({
+                                  inputRange: [0, 1],
+                                  outputRange: [-8, 0],
+                                }),
+                              },
+                            ],
+                          }}
+                        >
+                          <ThemedText
+                            style={[styles.errorText, { color: errorColor }]}
+                          >
+                            {serverError}
+                          </ThemedText>
+                        </Animated.View>
+                      ) : (
+                        <ThemedText style={styles.errorText}></ThemedText>
+                      )}
+                    </View>
                   </>
                 )}
               />
@@ -375,18 +467,15 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   form: {
-    gap: 16,
+    gap: 20,
   },
-  inputWrapper: {
-    marginBottom: 4,
-  },
+
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
     borderWidth: 1.5,
     borderRadius: 12,
     paddingHorizontal: 12,
-    height: 48,
     minHeight: 48,
     ...Platform.select({
       ios: {
@@ -425,10 +514,13 @@ const styles = StyleSheet.create({
       },
     }),
   },
+  errorContainer: {
+    minHeight: 20,
+    marginTop: 2,
+    marginLeft: 4,
+  },
   errorText: {
     fontSize: 12,
-    marginTop: 6,
-    marginLeft: 4,
   },
   eyeButton: {
     padding: 4,
@@ -440,7 +532,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 8,
+    marginTop: 4,
   },
   buttonDisabled: {
     backgroundColor: "#9CA3AF",
