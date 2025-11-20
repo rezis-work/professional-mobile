@@ -1,9 +1,15 @@
 import { ThemedText } from "@/components/themed-text";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { Ionicons } from "@expo/vector-icons";
-import { Image, Platform, StyleSheet, TouchableOpacity, View } from "react-native";
-import type { City } from "../../types";
 import { useThemeColorPalette } from "@/hooks/use-theme-color-palette";
+import { Ionicons } from "@expo/vector-icons";
+import {
+  Image,
+  Platform,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import type { City } from "../../types";
 
 export function CitiesGrid({
   cities,
@@ -26,7 +32,9 @@ export function CitiesGrid({
             styles.card,
             {
               backgroundColor: colors.cardBackground,
-              borderColor: city.isActive ? colors.availabilityNow : colors.border,
+              borderColor: city.isActive
+                ? colors.availabilityNow
+                : colors.border,
             },
             isDark && styles.cardDark,
           ]}
@@ -39,13 +47,27 @@ export function CitiesGrid({
               resizeMode="cover"
             />
             {city.isActive && (
-              <View style={[styles.activeBadge, { backgroundColor: colors.availabilityNow }]}>
-                <Ionicons name="checkmark-circle" size={14} color={colors.white} />
+              <View
+                style={[
+                  styles.activeBadge,
+                  { backgroundColor: colors.availabilityNow },
+                ]}
+              >
+                <Ionicons
+                  name="checkmark-circle"
+                  size={14}
+                  color={colors.white}
+                />
               </View>
             )}
           </View>
           <View style={styles.content}>
-            <ThemedText type="subtitle" style={styles.cityName} numberOfLines={1} ellipsizeMode="tail">
+            <ThemedText
+              type="subtitle"
+              style={styles.cityName}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
               {city.name}
             </ThemedText>
             <View style={styles.footer}>
@@ -57,7 +79,11 @@ export function CitiesGrid({
               <ThemedText
                 style={[
                   styles.viewText,
-                  { color: city.isActive ? colors.availabilityNow : colors.primary },
+                  {
+                    color: city.isActive
+                      ? colors.availabilityNow
+                      : colors.primary,
+                  },
                 ]}
                 numberOfLines={1}
               >

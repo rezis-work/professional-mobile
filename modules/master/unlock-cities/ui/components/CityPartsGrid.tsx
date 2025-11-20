@@ -1,15 +1,15 @@
 import { ThemedText } from "@/components/themed-text";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useThemeColorPalette } from "@/hooks/use-theme-color-palette";
 import { Ionicons } from "@expo/vector-icons";
 import {
-    ActivityIndicator,
-    Platform,
-    StyleSheet,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Platform,
+  StyleSheet,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import type { CityPart } from "../../types";
-import { useThemeColorPalette } from "@/hooks/use-theme-color-palette";
 
 export function CityPartsGrid({
   parts,
@@ -33,19 +33,35 @@ export function CityPartsGrid({
             key={part.id}
             style={[
               styles.card,
-              { backgroundColor: colors.cardBackground, borderColor: colors.border },
+              {
+                backgroundColor: colors.cardBackground,
+                borderColor: colors.border,
+              },
               isDark && styles.cardDark,
             ]}
           >
             <View style={styles.header}>
               <Ionicons name="location" size={16} color={colors.primary} />
-              <ThemedText type="subtitle" style={styles.partName} numberOfLines={1} ellipsizeMode="tail">
+              <ThemedText
+                type="subtitle"
+                style={styles.partName}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
                 {part.name}
               </ThemedText>
             </View>
-            <View style={[styles.costContainer, { backgroundColor: `${colors.warning}1A` }]}>
+            <View
+              style={[
+                styles.costContainer,
+                { backgroundColor: `${colors.warning}1A` },
+              ]}
+            >
               <Ionicons name="trophy" size={14} color={colors.warning} />
-              <ThemedText style={[styles.costText, { color: colors.warning }]} numberOfLines={1}>
+              <ThemedText
+                style={[styles.costText, { color: colors.warning }]}
+                numberOfLines={1}
+              >
                 {part.unlockCost} pts
               </ThemedText>
             </View>

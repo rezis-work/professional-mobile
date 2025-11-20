@@ -6,6 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import {
   ActivityIndicator,
+  Platform,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -72,7 +73,10 @@ export function NotificationsListView() {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[
+          styles.scrollContent,
+          Platform.OS === "ios" && { paddingBottom: 100 },
+        ]}
         refreshControl={
           <RefreshControl refreshing={isRefetching} onRefresh={refetch} />
         }
@@ -81,13 +85,15 @@ export function NotificationsListView() {
         {data.notifications.map((notification) => (
           <NotificationCard key={notification.id} notification={notification} />
         ))}
+        <View style={styles.paginationWrapper}>
+          <Pagination
+            totalcount={data.pagination.total}
+            limit={Number(data.pagination.limit)}
+            currentPage={page}
+            onPageChange={setPage}
+          />
+        </View>
       </ScrollView>
-      <Pagination
-        totalcount={data.pagination.total}
-        limit={Number(data.pagination.limit)}
-        currentPage={page}
-        onPageChange={setPage}
-      />
     </View>
   );
 }
@@ -102,6 +108,10 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: 16,
     gap: 12,
+  },
+  paginationWrapper: {
+    marginTop: 8,
+    marginBottom: 8,
   },
   centerContainer: {
     flex: 1,

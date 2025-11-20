@@ -1,13 +1,16 @@
+import { HapticTab } from "@/components/haptic-tab";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useThemeColorPalette } from "@/hooks/use-theme-color-palette";
 import { useAuth } from "@/lib/auth";
 import { useGetUnreadCount } from "@/modules/master/notifications/hooks/use-get-unread-count";
 import { Ionicons } from "@expo/vector-icons";
 import { Redirect, Tabs } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { StyleSheet, Text, View } from "react-native";
+import { Platform, StyleSheet, Text, View } from "react-native";
 
 export default function MasterLayout() {
   const { t } = useTranslation();
+  const colors = useThemeColorPalette();
   const tint = useThemeColor({}, "tint");
   const text = useThemeColor({}, "text");
   const background = useThemeColor({}, "background");
@@ -26,10 +29,38 @@ export default function MasterLayout() {
         headerShown: true,
         tabBarActiveTintColor: tint,
         tabBarInactiveTintColor: text,
-        tabBarStyle: { backgroundColor: background },
-        headerStyle: { backgroundColor: background },
+        tabBarStyle: {
+          backgroundColor: background,
+          ...Platform.select({
+            ios: {
+              position: "absolute",
+              borderRadius: 20,
+              marginHorizontal: 12,
+              marginBottom: 20,
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: -4 },
+              shadowOpacity: 0.25,
+              shadowRadius: 12,
+              paddingTop: 6,
+              height: 70,
+              borderTopWidth: 0,
+              borderBottomWidth: 0,
+              borderWidth: 0,
+              backgroundColor: colors.secondaryBackground,
+            },
+            android: {
+              elevation: 8,
+              borderTopWidth: 0,
+            },
+          }),
+        },
+        headerStyle: {
+          backgroundColor: background,
+        },
         headerTitleStyle: { color: text },
+        headerTitleAlign: "left",
         headerShadowVisible: false,
+        tabBarButton: (props) => <HapticTab {...props} />,
       }}
     >
       <Tabs.Screen
@@ -39,6 +70,16 @@ export default function MasterLayout() {
           tabBarLabel: t("masterNavigation.dashboard"),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home" size={size} color={color} />
+          ),
+          headerTitle: () => (
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
+            >
+              <Ionicons name="home" size={20} color={text} />
+              <Text style={{ color: text, fontSize: 20, fontWeight: "600" }}>
+                {t("masterNavigation.dashboard")}
+              </Text>
+            </View>
           ),
         }}
       />
@@ -50,6 +91,16 @@ export default function MasterLayout() {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person" size={size} color={color} />
           ),
+          headerTitle: () => (
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
+            >
+              <Ionicons name="person" size={20} color={text} />
+              <Text style={{ color: text, fontSize: 20, fontWeight: "600" }}>
+                {t("masterNavigation.masterProfile")}
+              </Text>
+            </View>
+          ),
         }}
       />
       <Tabs.Screen
@@ -59,6 +110,16 @@ export default function MasterLayout() {
           tabBarLabel: t("masterNavigation.profileSettings"),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="settings" size={size} color={color} />
+          ),
+          headerTitle: () => (
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
+            >
+              <Ionicons name="settings" size={20} color={text} />
+              <Text style={{ color: text, fontSize: 20, fontWeight: "600" }}>
+                {t("masterNavigation.profileSettings")}
+              </Text>
+            </View>
           ),
         }}
       />
@@ -70,6 +131,16 @@ export default function MasterLayout() {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="briefcase" size={size} color={color} />
           ),
+          headerTitle: () => (
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
+            >
+              <Ionicons name="briefcase" size={20} color={text} />
+              <Text style={{ color: text, fontSize: 20, fontWeight: "600" }}>
+                {t("masterNavigation.jobAssignment")}
+              </Text>
+            </View>
+          ),
         }}
       />
       <Tabs.Screen
@@ -79,6 +150,16 @@ export default function MasterLayout() {
           tabBarLabel: t("masterNavigation.unlockCities"),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="location" size={size} color={color} />
+          ),
+          headerTitle: () => (
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
+            >
+              <Ionicons name="location" size={20} color={text} />
+              <Text style={{ color: text, fontSize: 20, fontWeight: "600" }}>
+                {t("masterNavigation.unlockCities")}
+              </Text>
+            </View>
           ),
         }}
       />
@@ -90,6 +171,16 @@ export default function MasterLayout() {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="map" size={size} color={color} />
           ),
+          headerTitle: () => (
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
+            >
+              <Ionicons name="map" size={20} color={text} />
+              <Text style={{ color: text, fontSize: 20, fontWeight: "600" }}>
+                {t("masterNavigation.unlockedCities")}
+              </Text>
+            </View>
+          ),
         }}
       />
       <Tabs.Screen
@@ -99,6 +190,16 @@ export default function MasterLayout() {
           tabBarLabel: t("masterNavigation.leads"),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="people" size={size} color={color} />
+          ),
+          headerTitle: () => (
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
+            >
+              <Ionicons name="people" size={20} color={text} />
+              <Text style={{ color: text, fontSize: 20, fontWeight: "600" }}>
+                {t("masterNavigation.leads")}
+              </Text>
+            </View>
           ),
         }}
       />
@@ -125,6 +226,16 @@ export default function MasterLayout() {
               )}
             </View>
           ),
+          headerTitle: () => (
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
+            >
+              <Ionicons name="notifications" size={20} color={text} />
+              <Text style={{ color: text, fontSize: 20, fontWeight: "600" }}>
+                {t("masterNavigation.notifications")}
+              </Text>
+            </View>
+          ),
         }}
       />
       <Tabs.Screen
@@ -135,6 +246,16 @@ export default function MasterLayout() {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="star" size={size} color={color} />
           ),
+          headerTitle: () => (
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
+            >
+              <Ionicons name="star" size={20} color={text} />
+              <Text style={{ color: text, fontSize: 20, fontWeight: "600" }}>
+                {t("masterNavigation.reviews")}
+              </Text>
+            </View>
+          ),
         }}
       />
       <Tabs.Screen
@@ -144,6 +265,16 @@ export default function MasterLayout() {
           tabBarLabel: t("masterNavigation.billing"),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="card" size={size} color={color} />
+          ),
+          headerTitle: () => (
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
+            >
+              <Ionicons name="card" size={20} color={text} />
+              <Text style={{ color: text, fontSize: 20, fontWeight: "600" }}>
+                {t("masterNavigation.billing")}
+              </Text>
+            </View>
           ),
         }}
       />

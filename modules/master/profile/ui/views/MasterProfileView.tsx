@@ -1,25 +1,27 @@
-import { ThemedView } from "@/components/themed-view";
 import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
+import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useThemeColorPalette } from "@/hooks/use-theme-color-palette";
+import { useAuth } from "@/lib/auth";
+import { useGetMasterLeadStats } from "@/modules/master/profile/hooks/use-get-master-lead-stats";
+import { useMasterProfileById } from "@/modules/master/profile/hooks/useMasterProfileById";
+import { Ionicons } from "@expo/vector-icons";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
+  Image,
+  Platform,
   RefreshControl,
   ScrollView,
   StyleSheet,
   View,
-  Image,
-  Platform,
 } from "react-native";
-import { useAuth } from "@/lib/auth";
-import { useMasterProfileById } from "@/modules/master/profile/hooks/useMasterProfileById";
-import { useGetMasterLeadStats } from "@/modules/master/profile/hooks/use-get-master-lead-stats";
-import { useTranslation } from "react-i18next";
-import { useThemeColorPalette } from "@/hooks/use-theme-color-palette";
-import { useColorScheme } from "@/hooks/use-color-scheme";
-import { Ionicons } from "@expo/vector-icons";
 
 export function MasterProfileView() {
   const { user } = useAuth();
   const { t } = useTranslation();
+  const [refreshing, setRefreshing] = useState(false);
   const id = user?.id ?? "";
   const {
     data: profile,
@@ -46,7 +48,8 @@ export function MasterProfileView() {
     );
   }
 
-  if (isLoading || statsLoading) {
+  // Show loading only if we're actually loading for the first time (no cached data)
+  if ((isLoading || statsLoading) && !profile && !stats) {
     return (
       <ThemedView
         style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
@@ -92,9 +95,13 @@ export function MasterProfileView() {
     totalRevenue,
   } = stats;
 
-  const refreshing = isFetchingProfile || isFetchingStats;
   const onRefresh = async () => {
-    await Promise.all([refetchProfile(), refetchStats()]);
+    setRefreshing(true);
+    try {
+      await Promise.all([refetchProfile(), refetchStats()]);
+    } finally {
+      setRefreshing(false);
+    }
   };
 
   const colorScheme = useColorScheme();
@@ -134,7 +141,10 @@ export function MasterProfileView() {
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: colors.background }}
-      contentContainerStyle={styles.scrollContent}
+      contentContainerStyle={[
+        styles.scrollContent,
+        Platform.OS === "ios" && { paddingBottom: 100 },
+      ]}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
@@ -150,18 +160,18 @@ export function MasterProfileView() {
       >
         <View style={styles.profileHeader}>
           {imageUrl ? (
-            <Image 
-              source={{ uri: imageUrl }} 
-              style={[styles.profileImage, { borderColor: colors.border }]} 
+            <Image
+              source={{ uri: imageUrl }}
+              style={[styles.profileImage, { borderColor: colors.border }]}
             />
           ) : (
-            <View 
+            <View
               style={[
-                styles.profileImagePlaceholder, 
-                { 
+                styles.profileImagePlaceholder,
+                {
                   backgroundColor: colors.secondaryBackground,
-                  borderColor: colors.border 
-                }
+                  borderColor: colors.border,
+                },
               ]}
             >
               <Ionicons name="person" size={40} color={colors.mutedIcon} />
@@ -203,7 +213,12 @@ export function MasterProfileView() {
             isDark && [styles.statCardDark, { borderColor: colors.border }],
           ]}
         >
-          <View style={[styles.statIconContainer, { backgroundColor: colors.statBlue }]}>
+          <View
+            style={[
+              styles.statIconContainer,
+              { backgroundColor: colors.statBlue },
+            ]}
+          >
             <Ionicons name="checkmark-circle" size={24} color={colors.white} />
           </View>
           <ThemedText style={styles.statValue}>
@@ -221,7 +236,12 @@ export function MasterProfileView() {
             isDark && [styles.statCardDark, { borderColor: colors.border }],
           ]}
         >
-          <View style={[styles.statIconContainer, { backgroundColor: colors.statAmber }]}>
+          <View
+            style={[
+              styles.statIconContainer,
+              { backgroundColor: colors.statAmber },
+            ]}
+          >
             <Ionicons name="star" size={24} color={colors.white} />
           </View>
           <ThemedText style={styles.statValue}>
@@ -239,7 +259,12 @@ export function MasterProfileView() {
             isDark && [styles.statCardDark, { borderColor: colors.border }],
           ]}
         >
-          <View style={[styles.statIconContainer, { backgroundColor: colors.statGreen }]}>
+          <View
+            style={[
+              styles.statIconContainer,
+              { backgroundColor: colors.statGreen },
+            ]}
+          >
             <Ionicons name="trophy" size={24} color={colors.white} />
           </View>
           <ThemedText style={styles.statValue}>
@@ -257,7 +282,12 @@ export function MasterProfileView() {
             isDark && [styles.statCardDark, { borderColor: colors.border }],
           ]}
         >
-          <View style={[styles.statIconContainer, { backgroundColor: colors.statPurple }]}>
+          <View
+            style={[
+              styles.statIconContainer,
+              { backgroundColor: colors.statPurple },
+            ]}
+          >
             <Ionicons name="cash" size={24} color={colors.white} />
           </View>
           <ThemedText style={styles.statValue}>
@@ -314,7 +344,9 @@ export function MasterProfileView() {
             </ThemedText>
           </View>
           <View style={styles.leadStatItem}>
-            <ThemedText style={[styles.leadStatValue, { color: colors.success }]}>
+            <ThemedText
+              style={[styles.leadStatValue, { color: colors.success }]}
+            >
               {acceptedLeads ?? 0}
             </ThemedText>
             <ThemedText style={styles.leadStatLabel}>

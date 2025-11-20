@@ -145,9 +145,7 @@ export default function LoginScreen() {
             <ThemedText type="title" style={styles.title}>
               Welcome Back
             </ThemedText>
-            <ThemedText style={styles.subtitle}>
-              Sign in to continue
-            </ThemedText>
+            <ThemedText style={styles.subtitle}>Sign in to continue</ThemedText>
           </View>
 
           {/* Form */}
@@ -213,7 +211,9 @@ export default function LoginScreen() {
                       />
                     </View>
                     {errors.email && (
-                      <ThemedText style={[styles.errorText, { color: errorColor }]}>
+                      <ThemedText
+                        style={[styles.errorText, { color: errorColor }]}
+                      >
                         {errors.email.message}
                       </ThemedText>
                     )}
@@ -286,14 +286,18 @@ export default function LoginScreen() {
                         hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                       >
                         <Ionicons
-                          name={showPassword ? "eye-outline" : "eye-off-outline"}
+                          name={
+                            showPassword ? "eye-outline" : "eye-off-outline"
+                          }
                           size={20}
                           color={isDark ? "#9CA3AF" : "#6B7280"}
                         />
                       </TouchableOpacity>
                     </View>
                     {errors.password && (
-                      <ThemedText style={[styles.errorText, { color: errorColor }]}>
+                      <ThemedText
+                        style={[styles.errorText, { color: errorColor }]}
+                      >
                         {errors.password.message}
                       </ThemedText>
                     )}

@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
+  Platform,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
@@ -64,29 +65,25 @@ export function UnlockCityView() {
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: colors.background }}
-      contentContainerStyle={styles.scrollContent}
+      contentContainerStyle={[
+        styles.scrollContent,
+        Platform.OS === "ios" && { paddingBottom: 100 },
+      ]}
       showsVerticalScrollIndicator={false}
     >
-      {/* Header */}
-      <View style={styles.header}>
-        {selectedCityId && selectedCity && (
-          <TouchableOpacity
-            onPress={onBack}
-            style={[
-              styles.backButton,
-              { backgroundColor: `${colors.primary}1A` },
-            ]}
-            activeOpacity={0.7}
-          >
-            <Ionicons name="arrow-back" size={20} color={colors.primary} />
-          </TouchableOpacity>
-        )}
-        <ThemedText type="title" style={styles.title}>
-          {selectedCityId && selectedCity
-            ? `${selectedCity.name} Areas`
-            : t("masterNavigation.unlockCities")}
-        </ThemedText>
-      </View>
+      {/* Back Button */}
+      {selectedCityId && selectedCity && (
+        <TouchableOpacity
+          onPress={onBack}
+          style={[
+            styles.backButton,
+            { backgroundColor: `${colors.primary}1A` },
+          ]}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="arrow-back" size={20} color={colors.primary} />
+        </TouchableOpacity>
+      )}
 
       {/* Content */}
       {selectedCityId && selectedCity ? (
@@ -136,21 +133,13 @@ const styles = StyleSheet.create({
     padding: 16,
     gap: 16,
   },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    marginBottom: 8,
-  },
   backButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
-  },
-  title: {
-    flex: 1,
+    marginBottom: 8,
   },
   loadingContainer: {
     alignItems: "center",

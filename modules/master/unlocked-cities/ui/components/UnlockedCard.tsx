@@ -1,6 +1,6 @@
 import { ThemedText } from "@/components/themed-text";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { useThemeColor } from "@/hooks/use-theme-color";
+import { useThemeColorPalette } from "@/hooks/use-theme-color-palette";
 import { Ionicons } from "@expo/vector-icons";
 import {
   ActivityIndicator,
@@ -10,7 +10,6 @@ import {
   View,
 } from "react-native";
 import type { UnlockedCity } from "../../types";
-import { useThemeColorPalette } from "@/hooks/use-theme-color-palette";
 
 export function UnlockedCard({
   city,
@@ -41,14 +40,28 @@ export function UnlockedCard({
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <View style={[styles.locationIcon, { backgroundColor: `${colors.primary}1A` }]}>
+          <View
+            style={[
+              styles.locationIcon,
+              { backgroundColor: `${colors.primary}1A` },
+            ]}
+          >
             <Ionicons name="location" size={18} color={colors.primary} />
           </View>
           <View style={styles.headerText}>
-            <ThemedText type="subtitle" style={styles.cityName} numberOfLines={1} ellipsizeMode="tail">
+            <ThemedText
+              type="subtitle"
+              style={styles.cityName}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
               {city.cityName}
             </ThemedText>
-            <ThemedText style={styles.partName} numberOfLines={1} ellipsizeMode="tail">
+            <ThemedText
+              style={styles.partName}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
               {city.cityPartName}
             </ThemedText>
           </View>
@@ -56,7 +69,11 @@ export function UnlockedCard({
         <View
           style={[
             styles.statusBadge,
-            { backgroundColor: city.isActive ? colors.availabilityNow : colors.mutedIcon },
+            {
+              backgroundColor: city.isActive
+                ? colors.availabilityNow
+                : colors.mutedIcon,
+            },
           ]}
         >
           <Ionicons
@@ -79,7 +96,11 @@ export function UnlockedCard({
         </View>
         <View style={styles.detailItem}>
           <View style={styles.detailIconContainer}>
-            <Ionicons name="calendar-outline" size={13} color={colors.mutedIcon} />
+            <Ionicons
+              name="calendar-outline"
+              size={13}
+              color={colors.mutedIcon}
+            />
           </View>
           <ThemedText style={styles.detailText} numberOfLines={1}>
             {unlockedDate}
@@ -93,7 +114,7 @@ export function UnlockedCard({
         disabled={isPending}
         style={[
           styles.removeButton,
-          { 
+          {
             backgroundColor: colors.error,
             shadowColor: colors.error,
           },
@@ -106,11 +127,11 @@ export function UnlockedCard({
         ) : (
           <>
             <Ionicons name="trash-outline" size={13} color={colors.white} />
-              <ThemedText
-                style={styles.removeButtonText}
-                lightColor={colors.white}
-                darkColor={colors.white}
-              >
+            <ThemedText
+              style={styles.removeButtonText}
+              lightColor={colors.white}
+              darkColor={colors.white}
+            >
               Remove
             </ThemedText>
           </>

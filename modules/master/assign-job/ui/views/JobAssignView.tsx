@@ -1,33 +1,31 @@
-import { useState } from "react";
-import {
-  ScrollView,
-  View,
-  StyleSheet,
-  ActivityIndicator,
-  TouchableOpacity,
-  Platform,
-  Alert,
-} from "react-native";
 import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
+import { useToast } from "@/components/toast";
+import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useThemeColorPalette } from "@/hooks/use-theme-color-palette";
+import { Ionicons } from "@expo/vector-icons";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
+import {
+  ActivityIndicator,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { useAssignJob } from "../../hooks/useAssignJob";
 import { useCategories } from "../../hooks/useCategories";
 import { useJobsByCategoryId } from "../../hooks/useJobsByCategoryId";
-import type { Category, Job } from "../../types";
-import { CategoryGrid } from "../components/CategoryGrid";
-import { JobsGrid } from "../components/JobsGrid";
-import { useAssignJob } from "../../hooks/useAssignJob";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { jobAssignmentFormSchema } from "../../schema";
+import type { Category, Job } from "../../types";
 import {
   AssignmentForm,
   type JobAssignmentFormData,
 } from "../components/AssignmentForm";
-import { useTranslation } from "react-i18next";
-import { useThemeColorPalette } from "@/hooks/use-theme-color-palette";
-import { useColorScheme } from "@/hooks/use-color-scheme";
-import { useToast } from "@/components/toast";
-import { Ionicons } from "@expo/vector-icons";
+import { CategoryGrid } from "../components/CategoryGrid";
+import { JobsGrid } from "../components/JobsGrid";
 
 export function JobAssignView() {
   const { t } = useTranslation();
@@ -123,21 +121,6 @@ export function JobAssignView() {
     );
   };
 
-  const getStepTitle = () => {
-    switch (step) {
-      case "category":
-        return t("masterNavigation.jobAssignment");
-      case "job":
-        return "Select Job";
-      case "details":
-        return "Job Details";
-      case "confirm":
-        return "Confirmation";
-      default:
-        return "";
-    }
-  };
-
   const getBackHandler = () => {
     if (step === "job") return handleBackToCategories;
     if (step === "details") return handleBackToJobs;
@@ -148,26 +131,22 @@ export function JobAssignView() {
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: colors.background }}
-      contentContainerStyle={styles.scrollContent}
+      contentContainerStyle={[
+        styles.scrollContent,
+        Platform.OS === "ios" && { paddingBottom: 100 },
+      ]}
       showsVerticalScrollIndicator={false}
     >
-      {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.headerContent}>
-          {step !== "category" && (
-            <TouchableOpacity
-              onPress={getBackHandler()}
-              style={styles.backButton}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="arrow-back" size={20} color={colors.primary} />
-            </TouchableOpacity>
-          )}
-          <ThemedText type="title" style={styles.title}>
-            {getStepTitle()}
-          </ThemedText>
-        </View>
-      </View>
+      {/* Back Button */}
+      {step !== "category" && (
+        <TouchableOpacity
+          onPress={getBackHandler()}
+          style={styles.backButton}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="arrow-back" size={20} color={colors.primary} />
+        </TouchableOpacity>
+      )}
 
       {/* Category Step */}
       {step === "category" && (
@@ -206,19 +185,29 @@ export function JobAssignView() {
           {jobsLoading ? (
             <View style={styles.loadingContainer}>
               <ActivityIndicator size="large" color={colors.primary} />
-              <ThemedText style={styles.loadingText}>Loading jobs...</ThemedText>
+              <ThemedText style={styles.loadingText}>
+                Loading jobs...
+              </ThemedText>
             </View>
           ) : jobsError ? (
             <View style={styles.errorContainer}>
               <Ionicons name="alert-circle" size={32} color={colors.error} />
-              <ThemedText style={[styles.errorText, { color: colors.error }]}>Failed to load jobs</ThemedText>
+              <ThemedText style={[styles.errorText, { color: colors.error }]}>
+                Failed to load jobs
+              </ThemedText>
             </View>
           ) : jobsData?.data?.length ? (
             <JobsGrid jobs={jobsData.data} onSelect={handleJobSelect} />
           ) : (
             <View style={styles.emptyContainer}>
-              <Ionicons name="briefcase-outline" size={32} color={colors.mutedIcon} />
-              <ThemedText style={styles.emptyText}>No jobs available</ThemedText>
+              <Ionicons
+                name="briefcase-outline"
+                size={32}
+                color={colors.mutedIcon}
+              />
+              <ThemedText style={styles.emptyText}>
+                No jobs available
+              </ThemedText>
             </View>
           )}
         </View>
@@ -242,13 +231,22 @@ export function JobAssignView() {
       {step === "confirm" && selectedJob && (
         <View>
           <View style={styles.confirmHeader}>
-            <Ionicons name="checkmark-circle" size={48} color={colors.success} />
+            <Ionicons
+              name="checkmark-circle"
+              size={48}
+              color={colors.success}
+            />
             <ThemedText type="title" style={styles.confirmTitle}>
               Confirm Job Assignment
             </ThemedText>
           </View>
 
-          <View style={[styles.confirmDetails, { backgroundColor: `${colors.primary}0D` }]}>
+          <View
+            style={[
+              styles.confirmDetails,
+              { backgroundColor: `${colors.primary}0D` },
+            ]}
+          >
             <View style={styles.confirmRow}>
               <ThemedText style={styles.confirmLabel}>Job:</ThemedText>
               <ThemedText style={styles.confirmValue}>
@@ -260,14 +258,18 @@ export function JobAssignView() {
               return (
                 <>
                   <View style={styles.confirmRow}>
-                    <ThemedText style={styles.confirmLabel}>Price Range:</ThemedText>
+                    <ThemedText style={styles.confirmLabel}>
+                      Price Range:
+                    </ThemedText>
                     <ThemedText style={styles.confirmValue}>
                       {formData.priceMin} - {formData.priceMax}
                     </ThemedText>
                   </View>
                   {formData.durationMinutes && (
                     <View style={styles.confirmRow}>
-                      <ThemedText style={styles.confirmLabel}>Duration:</ThemedText>
+                      <ThemedText style={styles.confirmLabel}>
+                        Duration:
+                      </ThemedText>
                       <ThemedText style={styles.confirmValue}>
                         {formData.durationMinutes} minutes
                       </ThemedText>
@@ -290,16 +292,23 @@ export function JobAssignView() {
             <TouchableOpacity
               onPress={() => setStep("details")}
               style={[
-                styles.confirmButton, 
+                styles.confirmButton,
                 styles.backConfirmButton,
-                { 
+                {
                   backgroundColor: colors.secondaryBackground,
-                  borderColor: colors.border 
-                }
+                  borderColor: colors.border,
+                },
               ]}
               activeOpacity={0.7}
             >
-              <ThemedText style={[styles.backConfirmButtonText, { color: colors.mutedIcon }]}>Edit</ThemedText>
+              <ThemedText
+                style={[
+                  styles.backConfirmButtonText,
+                  { color: colors.mutedIcon },
+                ]}
+              >
+                Edit
+              </ThemedText>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={handleConfirmAssignment}
@@ -338,24 +347,13 @@ const styles = StyleSheet.create({
     padding: 16,
     gap: 16,
   },
-  header: {
-    marginBottom: 8,
-  },
-  headerContent: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
   backButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
-  },
-  title: {
-    flex: 1,
-    marginBottom: 0,
+    marginBottom: 8,
   },
   card: {
     borderRadius: 16,

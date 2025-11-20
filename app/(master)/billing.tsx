@@ -1,9 +1,7 @@
-import { useThemeColor } from "@/hooks/use-theme-color";
 import { BillingListView } from "@/modules/master/billing/ui/views/BillingListView";
 import { StyleSheet } from "react-native";
 
 export default function BillingScreen() {
-
   return (
     <>
       <BillingListView />

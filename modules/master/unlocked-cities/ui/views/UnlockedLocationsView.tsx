@@ -1,35 +1,38 @@
-import {
-  ScrollView,
-  View,
-  StyleSheet,
-  ActivityIndicator
-} from "react-native";
-import { ThemedText } from "@/components/themed-text";
-import { useGetUnlockedMasterLocations } from "../../hooks/useGetUnlockedMasterLocations";
+import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useThemeColorPalette } from "@/hooks/use-theme-color-palette";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { Platform, ScrollView, StyleSheet, View } from "react-native";
 import { useDeleteUnlockedLocation } from "../../hooks/useDeleteUnlockedLocation";
+import { useGetUnlockedMasterLocations } from "../../hooks/useGetUnlockedMasterLocations";
 import type { UnlockedCity } from "../../types";
 import {
-  UnlockedSkeleton,
   UnlockedError,
   UnlockedNoData,
+  UnlockedSkeleton,
 } from "../components/States";
 import { UnlockedCard } from "../components/UnlockedCard";
-import { useTranslation } from "react-i18next";
-import { useThemeColorPalette } from "@/hooks/use-theme-color-palette";
-import { useColorScheme } from "@/hooks/use-color-scheme";
-
 
 export function UnlockedLocationsView() {
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
   const colors = useThemeColorPalette();
+  const [pendingCityPartId, setPendingCityPartId] = useState<string | null>(
+    null
+  );
 
   const { data, isLoading, isError, error } = useGetUnlockedMasterLocations();
-  const { mutate: deleteUnlockedLocation, isPending } =
-    useDeleteUnlockedLocation();
+  const { mutate: deleteUnlockedLocation } = useDeleteUnlockedLocation();
 
   const unlockedCities: UnlockedCity[] = data?.data || [];
+
+  const handleRemove = (cityPartId: string) => {
+    setPendingCityPartId(cityPartId);
+    deleteUnlockedLocation(cityPartId, {
+      onSettled: () => setPendingCityPartId(null),
+    });
+  };
 
   if (isLoading) return <UnlockedSkeleton />;
   if (isError) return <UnlockedError message={(error as any)?.message} />;
@@ -38,20 +41,12 @@ export function UnlockedLocationsView() {
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: colors.background }}
-      contentContainerStyle={styles.scrollContent}
+      contentContainerStyle={[
+        styles.scrollContent,
+        Platform.OS === "ios" && { paddingBottom: 100 },
+      ]}
       showsVerticalScrollIndicator={false}
     >
-      {/* Header */}
-      <View style={styles.header}>
-        <ThemedText type="title" style={styles.title} numberOfLines={1}>
-          {t("masterNavigation.unlockedCities")}
-        </ThemedText>
-        <ThemedText style={styles.subtitle} numberOfLines={1}>
-          {unlockedCities.length}{" "}
-          {unlockedCities.length === 1 ? "city unlocked" : "cities unlocked"}
-        </ThemedText>
-      </View>
-
       {/* Cities Grid */}
       <View style={styles.grid}>
         {unlockedCities.map((city) => {
@@ -60,8 +55,8 @@ export function UnlockedLocationsView() {
             <UnlockedCard
               key={city.cityPartId}
               city={city}
-              isPending={isPending}
-              onRemove={deleteUnlockedLocation}
+              isPending={pendingCityPartId === city.cityPartId}
+              onRemove={handleRemove}
               unlockedDate={unlockedDate}
             />
           );
@@ -75,20 +70,6 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: 16,
     gap: 16,
-  },
-  header: {
-    marginBottom: 12,
-    gap: 4,
-    flexShrink: 1,
-  },
-  title: {
-    marginBottom: 0,
-    flexShrink: 1,
-  },
-  subtitle: {
-    fontSize: 14,
-    opacity: 0.7,
-    flexShrink: 1,
   },
   grid: {
     flexDirection: "row",

@@ -1,36 +1,30 @@
-import { ThemedView } from "@/components/themed-view";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { ThemedText } from "@/components/themed-text";
+import { useToast } from "@/components/toast";
+import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useThemeColorPalette } from "@/hooks/use-theme-color-palette";
+import { useAuth } from "@/lib/auth";
+import { Ionicons } from "@expo/vector-icons";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import {
-  TouchableOpacity,
-  View,
+  ActivityIndicator,
+  Platform,
   ScrollView,
   StyleSheet,
-  Platform,
-  ActivityIndicator,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { useEffect, useState } from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import {
-  availabilitySchema,
-  profileSchema,
-  type ProfileFormValues,
-  type AvailabilityFormValues,
-} from "../../schema";
-import { useUpsertProfile } from "../../hooks/useUpsertProfile";
-import { useUpdateAvailability } from "../../hooks/useUpdateAvailability";
-import { useAuth } from "@/lib/auth";
 import { useMasterProfileById } from "../../hooks/useMasterProfileById";
-import { CityInput } from "../components/CityInput";
-import { BioInput } from "../components/BioInput";
-import { ImagePickerInput } from "../components/ImagePickerInput";
+import { useUpdateAvailability } from "../../hooks/useUpdateAvailability";
+import { useUpsertProfile } from "../../hooks/useUpsertProfile";
+import { profileSchema, type ProfileFormValues } from "../../schema";
 import { AvailabilityButtons } from "../components/AvailabilityButtons";
-import { useTranslation } from "react-i18next";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { useThemeColorPalette } from "@/hooks/use-theme-color-palette";
-import { useColorScheme } from "@/hooks/use-color-scheme";
-import { useToast } from "@/components/toast";
-import { Ionicons } from "@expo/vector-icons";
+import { BioInput } from "../components/BioInput";
+import { CityInput } from "../components/CityInput";
+import { ImagePickerInput } from "../components/ImagePickerInput";
 
 export function MasterSettingsView() {
   const { user } = useAuth();
@@ -88,7 +82,10 @@ export function MasterSettingsView() {
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: colors.background }}
-      contentContainerStyle={styles.scrollContent}
+      contentContainerStyle={[
+        styles.scrollContent,
+        Platform.OS === "ios" && { paddingBottom: 100 },
+      ]}
       keyboardShouldPersistTaps="handled"
       showsVerticalScrollIndicator={false}
     >
@@ -100,13 +97,6 @@ export function MasterSettingsView() {
           isDark && [styles.cardDark, { borderColor: colors.border }],
         ]}
       >
-        <View style={styles.sectionHeader}>
-          <Ionicons name="person" size={20} color={colors.primary} />
-          <ThemedText type="subtitle" style={styles.sectionTitle}>
-            {t("masterNavigation.profileSettings")}
-          </ThemedText>
-        </View>
-
         <CityInput
           setValue={setValue as any}
           error={errors.city?.message}
@@ -136,8 +126,16 @@ export function MasterSettingsView() {
             <ActivityIndicator color={colors.white} />
           ) : (
             <>
-              <Ionicons name="checkmark-circle" size={20} color={colors.white} />
-              <ThemedText style={styles.saveButtonText} lightColor={colors.white} darkColor={colors.white}>
+              <Ionicons
+                name="checkmark-circle"
+                size={20}
+                color={colors.white}
+              />
+              <ThemedText
+                style={styles.saveButtonText}
+                lightColor={colors.white}
+                darkColor={colors.white}
+              >
                 {t("common.saveProfile")}
               </ThemedText>
             </>
@@ -158,6 +156,13 @@ export function MasterSettingsView() {
           <ThemedText type="subtitle" style={styles.sectionTitle}>
             {t("settings.availability")}
           </ThemedText>
+          {updatingAvail && (
+            <ActivityIndicator
+              size="small"
+              color={colors.primary}
+              style={{ marginLeft: 8 }}
+            />
+          )}
         </View>
         <AvailabilityButtons
           value={selectedAvailability}
@@ -166,11 +171,6 @@ export function MasterSettingsView() {
             updAvail(key);
           }}
         />
-        {updatingAvail && (
-          <View style={styles.loadingIndicator}>
-            <ActivityIndicator size="small" color={colors.primary} />
-          </View>
-        )}
       </View>
 
       {/* Language Card */}
@@ -252,9 +252,5 @@ const styles = StyleSheet.create({
   saveButtonText: {
     fontSize: 16,
     fontWeight: "600",
-  },
-  loadingIndicator: {
-    alignItems: "center",
-    paddingTop: 8,
   },
 });

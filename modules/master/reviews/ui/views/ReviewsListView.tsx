@@ -1,15 +1,21 @@
-import { useState } from "react";
-import { ScrollView, View, StyleSheet, RefreshControl, ActivityIndicator } from "react-native";
-import { ThemedText } from "@/components/themed-text";
-import { ReviewCard } from "../components/ReviewCard";
-import { StatusFilter } from "../components/StatusFilter";
 import { Pagination } from "@/components/Pagination";
+import { ThemedText } from "@/components/themed-text";
+import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useThemeColorPalette } from "@/hooks/use-theme-color-palette";
+import { Ionicons } from "@expo/vector-icons";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import {
+  ActivityIndicator,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  View,
+} from "react-native";
 import { useGetMasterReviews } from "../../hooks/use-get-master-reviews";
 import { ReviewStatus } from "../../types";
-import { useTranslation } from "react-i18next";
-import { useThemeColorPalette } from "@/hooks/use-theme-color-palette";
-import { useColorScheme } from "@/hooks/use-color-scheme";
-import { Ionicons } from "@expo/vector-icons";
+import { ReviewCard } from "../components/ReviewCard";
+import { StatusFilter } from "../components/StatusFilter";
 
 export function ReviewsListView() {
   const { t } = useTranslation();
@@ -41,22 +47,43 @@ export function ReviewsListView() {
       />
 
       {isLoading ? (
-        <View style={[styles.centerContainer, { backgroundColor: colors.background }]}>
+        <View
+          style={[
+            styles.centerContainer,
+            { backgroundColor: colors.background },
+          ]}
+        >
           <ActivityIndicator size="large" color={colors.primary} />
-          <ThemedText style={styles.loadingText}>{t("reviews.loadingReviews")}</ThemedText>
+          <ThemedText style={styles.loadingText}>
+            {t("reviews.loadingReviews")}
+          </ThemedText>
         </View>
       ) : error ? (
-        <View style={[styles.centerContainer, { backgroundColor: colors.background }]}>
+        <View
+          style={[
+            styles.centerContainer,
+            { backgroundColor: colors.background },
+          ]}
+        >
           <Ionicons name="alert-circle" size={48} color={colors.error} />
-          <ThemedText style={styles.errorTitle}>{t("reviews.errorLoadingReviews")}</ThemedText>
+          <ThemedText style={styles.errorTitle}>
+            {t("reviews.errorLoadingReviews")}
+          </ThemedText>
           <ThemedText style={styles.errorMessage}>
             {error instanceof Error ? error.message : "Unknown error"}
           </ThemedText>
         </View>
       ) : !data || !data.data.reviews.length ? (
-        <View style={[styles.centerContainer, { backgroundColor: colors.background }]}>
+        <View
+          style={[
+            styles.centerContainer,
+            { backgroundColor: colors.background },
+          ]}
+        >
           <Ionicons name="star-outline" size={48} color={colors.mutedIcon} />
-          <ThemedText style={styles.emptyText}>{t("reviews.noReviewsFound")}</ThemedText>
+          <ThemedText style={styles.emptyText}>
+            {t("reviews.noReviewsFound")}
+          </ThemedText>
         </View>
       ) : (
         <>

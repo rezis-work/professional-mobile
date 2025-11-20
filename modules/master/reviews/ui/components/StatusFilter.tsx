@@ -1,10 +1,10 @@
-import { View, StyleSheet, TouchableOpacity, Platform } from "react-native";
 import { ThemedText } from "@/components/themed-text";
-import { ReviewStatus } from "../../types";
-import { useTranslation } from "react-i18next";
-import { useThemeColorPalette } from "@/hooks/use-theme-color-palette";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useThemeColorPalette } from "@/hooks/use-theme-color-palette";
 import { Ionicons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
+import { Platform, StyleSheet, TouchableOpacity, View } from "react-native";
+import { ReviewStatus } from "../../types";
 
 interface StatusFilterProps {
   selectedStatus: string;
@@ -23,8 +23,16 @@ export function StatusFilter({
   const statuses = [
     { label: t("reviews.all"), value: ReviewStatus.UNDEFINED, icon: "list" },
     { label: t("common.pending"), value: ReviewStatus.PENDING, icon: "time" },
-    { label: t("common.approved"), value: ReviewStatus.APPROVED, icon: "checkmark-circle" },
-    { label: t("common.rejected"), value: ReviewStatus.REJECTED, icon: "close-circle" },
+    {
+      label: t("common.approved"),
+      value: ReviewStatus.APPROVED,
+      icon: "checkmark-circle",
+    },
+    {
+      label: t("common.rejected"),
+      value: ReviewStatus.REJECTED,
+      icon: "close-circle",
+    },
   ];
 
   return (
@@ -37,7 +45,13 @@ export function StatusFilter({
             style={[
               styles.chip,
               isActive
-                ? [styles.chipActive, { backgroundColor: colors.primary, borderColor: colors.primary }]
+                ? [
+                    styles.chipActive,
+                    {
+                      backgroundColor: colors.primary,
+                      borderColor: colors.primary,
+                    },
+                  ]
                 : [
                     styles.chipInactive,
                     {
@@ -73,6 +87,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 8,
     paddingHorizontal: 16,
+    paddingTop: 16,
     paddingBottom: 12,
     flexWrap: "wrap",
   },

@@ -12,23 +12,27 @@ import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   Alert,
+  Platform,
   RefreshControl,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function MasterDashboardScreen() {
-  const { logout, user } = useAuth();
+  const { logout, user, refetch: refetchAuth } = useAuth();
   const router = useRouter();
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
   const [refreshing, setRefreshing] = useState(false);
+  const insets = useSafeAreaInsets();
 
+  const id = user?.id ?? "";
   const { profile, stats, isLoading, refetch, isFetching } =
-    useMasterDashboard();
+    useMasterDashboard(id);
 
   const backgroundColor = useThemeColor({}, "background");
   const cardBg = useThemeColor({}, "cardBackground");
@@ -43,7 +47,7 @@ export default function MasterDashboardScreen() {
   const handleRefresh = async () => {
     setRefreshing(true);
     try {
-      await refetch();
+      await Promise.all([refetchAuth(), refetch()]);
     } finally {
       setRefreshing(false);
     }
@@ -52,14 +56,14 @@ export default function MasterDashboardScreen() {
   const handleLogout = async () => {
     try {
       await logout();
-      Alert.alert(t("common.success"), t("common.loggedOut"));
-      router.replace("/(auth)/login");
+      // Navigation will happen automatically via app/index.tsx redirect when user becomes null
     } catch {
       Alert.alert(t("common.error"), t("common.logoutFailed"));
     }
   };
 
-  if (isLoading) {
+  // Show loading only if id exists and we're actually loading (first time)
+  if (id && isLoading && !profile && !stats) {
     return (
       <ThemedView style={styles.container}>
         <View style={styles.loadingContainer}>
@@ -73,10 +77,13 @@ export default function MasterDashboardScreen() {
     <ThemedView style={[styles.container, { backgroundColor }]}>
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[
+          styles.scrollContent,
+          Platform.OS === "ios" && { paddingBottom: 100 },
+        ]}
         refreshControl={
           <RefreshControl
-            refreshing={refreshing || isFetching}
+            refreshing={refreshing}
             onRefresh={handleRefresh}
             tintColor={tint}
             colors={[tint]}
@@ -319,6 +326,7 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   header: {
+    marginTop: -8,
     marginBottom: 12,
   },
   userName: {

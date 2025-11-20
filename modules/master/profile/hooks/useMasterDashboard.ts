@@ -1,22 +1,9 @@
-import { useAuth } from "@/lib/auth";
-import { useQuery } from "@tanstack/react-query";
-import { getMasterLeadStats, getMasterSelf } from "../services/profile";
+import { useGetMasterLeadStats } from "./use-get-master-lead-stats";
+import { useMasterProfileById } from "./useMasterProfileById";
 
-export function useMasterDashboard() {
-  const { user } = useAuth();
-  const id = user?.id ?? "";
-
-  const profileQuery = useQuery({
-    queryKey: ["master-profile", id],
-    queryFn: () => getMasterSelf(),
-    enabled: !!id,
-  });
-
-  const statsQuery = useQuery({
-    queryKey: ["master-lead-stats", id],
-    queryFn: () => getMasterLeadStats(id),
-    enabled: !!id,
-  });
+export function useMasterDashboard(id: string) {
+  const profileQuery = useMasterProfileById(id);
+  const statsQuery = useGetMasterLeadStats(id);
 
   return {
     profile: profileQuery.data,

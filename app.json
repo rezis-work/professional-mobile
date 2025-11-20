@@ -13,7 +13,9 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.rezinio.professionals",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "UIViewControllerBasedStatusBarAppearance": false,
+        "UIHomeIndicatorAutoHidden": true
       }
     },
     "android": {

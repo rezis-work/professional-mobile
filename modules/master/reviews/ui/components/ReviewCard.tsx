@@ -38,8 +38,17 @@ export function ReviewCard({ review }: ReviewCardProps) {
       ]}
     >
       <View style={styles.header}>
-        <View style={[styles.avatar, { backgroundColor: colors.secondaryBackground }]}>
-          <ThemedText style={styles.avatarText} lightColor={colors.white} darkColor={colors.white}>
+        <View
+          style={[
+            styles.avatar,
+            { backgroundColor: colors.secondaryBackground },
+          ]}
+        >
+          <ThemedText
+            style={styles.avatarText}
+            lightColor={colors.white}
+            darkColor={colors.white}
+          >
             {getInitials(review.client.fullName)}
           </ThemedText>
         </View>
@@ -48,20 +57,33 @@ export function ReviewCard({ review }: ReviewCardProps) {
             {review.client.fullName}
           </ThemedText>
           <View style={styles.dateRow}>
-            <Ionicons name="calendar-outline" size={12} color={colors.mutedIcon} />
+            <Ionicons
+              name="calendar-outline"
+              size={12}
+              color={colors.mutedIcon}
+            />
             <ThemedText style={styles.date}>
               {formatDate(review.createdAt)}
             </ThemedText>
           </View>
         </View>
         <View style={[styles.badge, getStatusStyle(review.status, colors)]}>
-          <ThemedText style={styles.badgeText} lightColor={colors.white} darkColor={colors.white}>
+          <ThemedText
+            style={styles.badgeText}
+            lightColor={colors.white}
+            darkColor={colors.white}
+          >
             {review.status}
           </ThemedText>
         </View>
       </View>
 
-      <View style={[styles.ratingSection, { backgroundColor: colors.secondaryBackground }]}>
+      <View
+        style={[
+          styles.ratingSection,
+          { backgroundColor: colors.secondaryBackground },
+        ]}
+      >
         <View style={styles.mainRating}>
           <Ionicons name="star" size={24} color={colors.warning} />
           <ThemedText style={[styles.ratingValue, { color: colors.warning }]}>
@@ -84,7 +106,9 @@ export function ReviewCard({ review }: ReviewCardProps) {
               {t("reviews.price")}:
             </ThemedText>
           </View>
-          <ThemedText style={[styles.ratingValueSmall, { color: colors.warning }]}>
+          <ThemedText
+            style={[styles.ratingValueSmall, { color: colors.warning }]}
+          >
             {review.ratingPrice}
           </ThemedText>
         </View>
@@ -95,7 +119,9 @@ export function ReviewCard({ review }: ReviewCardProps) {
               {t("reviews.quality")}:
             </ThemedText>
           </View>
-          <ThemedText style={[styles.ratingValueSmall, { color: colors.warning }]}>
+          <ThemedText
+            style={[styles.ratingValueSmall, { color: colors.warning }]}
+          >
             {review.ratingQuality}
           </ThemedText>
         </View>
@@ -106,7 +132,9 @@ export function ReviewCard({ review }: ReviewCardProps) {
               {t("reviews.punctuality")}:
             </ThemedText>
           </View>
-          <ThemedText style={[styles.ratingValueSmall, { color: colors.warning }]}>
+          <ThemedText
+            style={[styles.ratingValueSmall, { color: colors.warning }]}
+          >
             {review.ratingPunctuality}
           </ThemedText>
         </View>
@@ -117,22 +145,41 @@ export function ReviewCard({ review }: ReviewCardProps) {
               {t("reviews.experience")}:
             </ThemedText>
           </View>
-          <ThemedText style={[styles.ratingValueSmall, { color: colors.warning }]}>
+          <ThemedText
+            style={[styles.ratingValueSmall, { color: colors.warning }]}
+          >
             {review.ratingExperience}
           </ThemedText>
         </View>
       </View>
 
       {review.comment && (
-        <View style={[styles.commentSection, { backgroundColor: colors.secondaryBackground }]}>
+        <View
+          style={[
+            styles.commentSection,
+            { backgroundColor: colors.secondaryBackground },
+          ]}
+        >
           <ThemedText style={styles.commentText}>{review.comment}</ThemedText>
         </View>
       )}
 
       {review.masterReply && (
-        <View style={[styles.replySection, { backgroundColor: `${colors.primary}1A`, borderLeftColor: colors.primary }]}>
+        <View
+          style={[
+            styles.replySection,
+            {
+              backgroundColor: `${colors.primary}1A`,
+              borderLeftColor: colors.primary,
+            },
+          ]}
+        >
           <View style={styles.sectionHeader}>
-            <Ionicons name="chatbubble-ellipses" size={16} color={colors.primary} />
+            <Ionicons
+              name="chatbubble-ellipses"
+              size={16}
+              color={colors.primary}
+            />
             <ThemedText style={styles.sectionTitle}>
               {t("reviews.yourReply")}:
             </ThemedText>
@@ -144,7 +191,10 @@ export function ReviewCard({ review }: ReviewCardProps) {
   );
 }
 
-function getStatusStyle(status: string, colors: ReturnType<typeof useThemeColorPalette>) {
+function getStatusStyle(
+  status: string,
+  colors: ReturnType<typeof useThemeColorPalette>
+) {
   switch (status.toLowerCase()) {
     case "approved":
       return { backgroundColor: colors.statusApproved };
