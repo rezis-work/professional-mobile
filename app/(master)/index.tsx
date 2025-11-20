@@ -29,7 +29,6 @@ export default function MasterDashboardScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
   const [refreshing, setRefreshing] = useState(false);
-  const insets = useSafeAreaInsets();
 
   const id = user?.id ?? "";
   const { profile, stats, isLoading, refetch, isFetching } =

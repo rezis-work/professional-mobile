@@ -22,20 +22,21 @@ export function MasterProfileView() {
   const { user } = useAuth();
   const { t } = useTranslation();
   const [refreshing, setRefreshing] = useState(false);
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
+  const colors = useThemeColorPalette();
   const id = user?.id ?? "";
   const {
     data: profile,
     isLoading,
     isError,
     refetch: refetchProfile,
-    isFetching: isFetchingProfile,
   } = useMasterProfileById(id);
   const {
     data: stats,
     isLoading: statsLoading,
     isError: statsError,
     refetch: refetchStats,
-    isFetching: isFetchingStats,
   } = useGetMasterLeadStats(id);
 
   if (!id) {
@@ -103,10 +104,6 @@ export function MasterProfileView() {
       setRefreshing(false);
     }
   };
-
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
-  const colors = useThemeColorPalette();
 
   const getAvailabilityColor = (avail: string | null) => {
     switch (avail) {
